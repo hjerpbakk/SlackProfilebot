@@ -53,5 +53,11 @@ namespace Test.Hjerpbakk.Profilebot {
             Assert.Equal(new ProfileBotCommand<int>(1).GetHashCode(),
                 new ProfileBotCommand<int>(1).GetHashCode());
         }
+
+        [Fact]
+        public void Equals_DifferentTypes_NotEqual() {
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            Assert.False(new ProfileBotCommand<int>(1).Equals(1));
+        }
     }
 }

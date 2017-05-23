@@ -1,6 +1,4 @@
-﻿using System;
-using Hjerpbakk.ProfileBot;
-using Hjerpbakk.ProfileBot.Contracts;
+﻿using Hjerpbakk.ProfileBot;
 using SlackConnector.Models;
 using Xunit;
 
