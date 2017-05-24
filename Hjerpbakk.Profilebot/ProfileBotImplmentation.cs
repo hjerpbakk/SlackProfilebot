@@ -96,13 +96,12 @@ namespace Hjerpbakk.ProfileBot {
                 }
             }
             catch (Exception e) {
+                logger.Error(e);
                 try {
-                    logger.Error(e);
                     await slackIntegration.SendDirectMessage(adminUserId, $"I crashed:{Environment.NewLine}{e}");
                 }
                 catch (Exception exception) {
-                    logger.Error(exception);
-                    throw;
+                    logger.Fatal(exception);
                 }
             }
         }

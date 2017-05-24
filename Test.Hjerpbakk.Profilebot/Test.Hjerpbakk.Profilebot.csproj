@@ -78,7 +78,7 @@
     <Compile Include="AdminUserTests.cs" />
     <Compile Include="ProfileBotCommandTests.cs" />
     <Compile Include="MessageParserTests.cs" />
-    <Compile Include="ProfilebotTests.cs" />
+    <Compile Include="ProfilebotImplmentationTests.cs" />
     <Compile Include="Contracts\ProfileValidationResultTests.cs" />
     <Compile Include="SlackIntegrationTests.cs" />
     <Compile Include="SlackProfileValidatorTests.cs" />

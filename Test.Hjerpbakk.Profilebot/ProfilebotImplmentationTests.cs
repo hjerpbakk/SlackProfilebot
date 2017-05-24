@@ -9,7 +9,7 @@ using SlackConnector.Models;
 using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot {
-    public class ProfilebotTests {
+    public class ProfilebotImplmentationTests {
         static readonly AdminUser adminUser;
 
         public static IEnumerable<object[]> InvalidMessages = new[] {
@@ -19,7 +19,7 @@ namespace Test.Hjerpbakk.Profilebot {
             new object[] {new SlackMessage {User = new SlackUser {Id = "Id"}}}
         };
 
-        static ProfilebotTests() {
+        static ProfilebotImplmentationTests() {
             adminUser = new AdminUser("U1TBU8336");
         }
 
