@@ -10,7 +10,6 @@ namespace Hjerpbakk.ProfileBot.Runner {
             logger = LogManager.GetCurrentClassLogger();
         }
 
-        // TODO: Ta ut vår SlackProfileValidator sammen med testene, og bruk sjekkeren slik den opprinnelig lå her...
         static void Main() {
             logger.Info("Starting Profilebot.");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
