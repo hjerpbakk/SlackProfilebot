@@ -118,7 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configuration\config.json">
+    <None Include="Configuration\config*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="NLog.config">
@@ -128,9 +128,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Configuration\config.default.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hjerpbakk.ProfileBot.Contracts\Hjerpbakk.Profilebot.Contracts.csproj">
