@@ -289,5 +289,5 @@ __pycache__/
 
 # Slack-secrets
 config.json
-!/bin
-!/bin/SlackConnector.pdb
+!/lib
+!/lib/SlackConnector.pdb

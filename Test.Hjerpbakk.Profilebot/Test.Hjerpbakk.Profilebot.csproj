@@ -41,7 +41,7 @@
     </Reference>
     <Reference Include="SlackConnector, Version=3.0.6345.29760, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\SlackConnector.dll</HintPath>
+      <HintPath>..\lib\SlackConnector.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
