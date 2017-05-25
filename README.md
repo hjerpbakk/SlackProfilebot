@@ -4,7 +4,11 @@
 
 In a large Slack team, it is important that user profiles are completed enough such that users can recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app or a Windows service.
 
-![Logo](https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/logo.png)
+<p align="center">
+
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/logo.png" alt="Profilebot" width="50%" />
+
+</p>
 
 ## Usage in Slack
 
