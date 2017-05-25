@@ -43,12 +43,12 @@ As a regular user, anything you say will have the same effect: Profilebot will l
 
 6. Copy the generated API token and paste it as your  `apiToken` in `config.json`:
 
-  ```
-  {
+   ```
+   {
   	"apiToken": "xxxx-00000000000-xxxxxxxxxxxxxxxxxxxxxxxx",
   	"adminUserId": ""  
-  }
-  ```
+   }
+   ```
 
 7. Run https://api.slack.com/methods/users.list/test to find the user id of one of the admins in your Slack team.
 
