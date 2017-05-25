@@ -45,8 +45,8 @@ As a regular user, anything you say will have the same effect: Profilebot will l
 
    ```
    {
-  	"apiToken": "xxxx-00000000000-xxxxxxxxxxxxxxxxxxxxxxxx",
-  	"adminUserId": ""  
+   	"apiToken": "xxxx-00000000000-xxxxxxxxxxxxxxxxxxxxxxxx",
+   	"adminUserId": ""  
    }
    ```
 
@@ -71,14 +71,14 @@ Customising the profile validation is easy, and you have two choices for how to 
 
 ### 1. Extend SlackProfileValidator
 
-Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `public ProfileValidationResult ValidateProfile(SlackUser user)` method.
+Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `ProfileValidationResult ValidateProfile(SlackUser user)` method.
 
 The default implementation checks only that a first name i set in a user's profile.
 
 ### 2. Inherit from ISlackProfileValidator and create your own validator
 
 1. Create a new class and inherit from `ISlackProfileValidator`.
-2. In `Hjerpbakk.ProfileBot.Runner.ProfileBotHost`, edit the `static IServiceContainer CompositionRoot(string slackToken, string adminUserId` method. Instead of `serviceContainer.Register<ISlackProfileValidator, SlackProfileValidator>();`, register your own validation class.
+2. In `Hjerpbakk.ProfileBot.Runner.ProfileBotHost`, edit the `IServiceContainer CompositionRoot(string slackToken, string adminUserId)` method. Instead of `serviceContainer.Register<ISlackProfileValidator, SlackProfileValidator>();`, register your own validation class.
 
 ## Running
 
