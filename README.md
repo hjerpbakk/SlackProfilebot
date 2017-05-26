@@ -69,7 +69,13 @@ You should now be able to send direct messages to Profilebot in your team's Slac
 
 ## Customize the profile validation
 
-See a [real world example from DIPS AS here](https://github.com/DIPSASA/SlackProfilebot/blob/master/Hjerpbakk.Profilebot/SlackProfileValidator.cs).
+In @DIPSASA we use the following validation rules:
+
+- The email used must be a @DIPSASA email
+- Username must be the same as in all other internal systems
+- Both first name and last name must be given
+- What I do must tell others what you do
+- A profile image must be set
 
 Customising the profile validation is easy, and you have two choices for how to do this.
 
