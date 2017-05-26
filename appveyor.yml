@@ -42,8 +42,8 @@ after_test:
  - codecov -f "coverage.xml"
  
 deploy_script:  
- - (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[apiToken]', '$env:SLACK_TOKEN') | Set-Content -Path Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json
- - (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json).replace('[adminUserId]', '$env:ADMIN_USER_ID') | Set-Content -Path Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json
+ - Set-Content -Path Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json -Value (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[apiToken]', '$env:SLACK_TOKEN')
+ - Set-Content -Path Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json -Value (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[adminUserId]', '$env:ADMIN_USER_ID')
  - docker build -t hjerpbakk/profilebot .
  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
  - docker push me/myfavoriteapp
