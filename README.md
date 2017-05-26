@@ -1,7 +1,5 @@
 # Profilebot - the profile checking Slackbot for you!
 
-[![Build status](https://ci.appveyor.com/api/projects/status/498ui2cq6tpxg7c7/branch/master?svg=true)](https://ci.appveyor.com/project/Sankra/slackprofilebot/branch/master) [![codecov](https://codecov.io/gh/Sankra/SlackProfilebot/branch/master/graph/badge.svg)](https://codecov.io/gh/Sankra/SlackProfilebot)
-
 In a large Slack team, it's important that user profiles are completed enough for the users to recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app (Windows) or a Windows service.
 
 <p align="center">
@@ -33,7 +31,7 @@ As a regular user, anything you say will have the same effect: Profilebot will l
 
 ## Download & setup
 
-1. Clone the repository: `git clone https://github.com/Sankra/SlackProfilebot.git`
+1. Clone the repository: `git clone https://github.com/DIPSASA/SlackProfilebot.git`
 
 2. Go to `Hjerpbakk.Profilebot.Runner/Configuration` and create a copy of `config.default.json`. 
 
@@ -69,13 +67,19 @@ You should now be able to send direct messages to Profilebot in your team's Slac
 
 ## Customize the profile validation
 
+In DIPS AS we use the following validation rules:
+
+- The email used must be a DIPS AS email
+- Username must be the same as in all other internal systems
+- Both first name and last name must be given
+- *What I do* must tell others what you do
+- A profile image must be set
+
 Customising the profile validation is easy, and you have two choices for how to do this.
 
 ### 1. Extend SlackProfileValidator
 
 Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `ProfileValidationResult ValidateProfile(SlackUser user)` method.
-
-The default implementation checks only that a first name i set in a user's profile.
 
 ### 2. Inherit from ISlackProfileValidator and create your own validator
 
