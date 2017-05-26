@@ -2,6 +2,14 @@ version: 1.0.{build}
 
 image: Visual Studio 2017
 
+environment:  
+  DOCKER_USER:
+    secure: i9T30C3Gi5+mGazI8PaXEA==
+  DOCKER_PASS:
+    secure: cIvXg8+kCw2JDjLaXUoKx/jAGsuIvnd6JeLDMcts7K8=
+install:  
+  - docker version
+
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
@@ -22,3 +30,8 @@ after_test:
  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
  - pip install codecov
  - codecov -f "coverage.xml"
+ 
+ deploy_script:  
+  - docker build -t hjerpbakk/profilebot .
+  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+  - docker push me/myfavoriteapp
