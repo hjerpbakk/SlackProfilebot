@@ -1,4 +1,4 @@
 ﻿{
-	"apiToken": "",
-	"adminUserId": ""  
+	"apiToken": "[apiToken]",
+	"adminUserId": "[adminUserId]"  
 }
