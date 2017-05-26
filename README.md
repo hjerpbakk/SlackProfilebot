@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/498ui2cq6tpxg7c7/branch/master?svg=true)](https://ci.appveyor.com/project/Sankra/slackprofilebot/branch/master) [![codecov](https://codecov.io/gh/Sankra/SlackProfilebot/branch/master/graph/badge.svg)](https://codecov.io/gh/Sankra/SlackProfilebot)
 
-In a large Slack team, it is important that user profiles are completed enough such that users can recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app or a Windows service.
+In a large Slack team, it's important that user profiles are completed enough for the users to recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app (Windows) or a Windows service.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/logo.png" alt="Profilebot" width="50%" />
@@ -14,7 +14,7 @@ Profilebot runs like any other Slackbot. Open a direct message to Profilebot and
 
 ### As admin
 
-If you are the admin of your Slack team, the following commands are available for you:
+If you are the admin of Profilebot, the following commands are available for you:
 
 - `validate all users`
 - `notify all users`
@@ -52,9 +52,9 @@ As a regular user, anything you say will have the same effect: Profilebot will l
    }
    ```
 
-7. Run https://api.slack.com/methods/users.list/test to find the user id of one of the admins in your Slack team.
+7. One user must be configured to be Profilebots admin user. This need not be an actual Slack admin, but the id must be a valid user id in the Slack team. Run https://api.slack.com/methods/users.list/test to find the user id you want to use.
 
-8. Copy the generated admin user id and paste it as your `adminUserId` in `config.json`:
+8. Copy the user id and paste it as your `adminUserId` in `config.json`:
 
    ```
    {
