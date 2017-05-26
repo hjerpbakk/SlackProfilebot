@@ -2,6 +2,10 @@ version: 1.0.{build}
 
 image: Visual Studio 2017
 
+skip_commits:
+  files:
+    - README.md
+
 environment:  
   DOCKER_USER:
     secure: i9T30C3Gi5+mGazI8PaXEA==
