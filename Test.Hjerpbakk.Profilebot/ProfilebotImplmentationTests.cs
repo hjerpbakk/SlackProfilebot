@@ -26,7 +26,7 @@ namespace Test.Hjerpbakk.Profilebot {
         [Fact]
         public void Constructor_NoSlackIntegration_Fails() {
             var exception =
-                Record.Exception(() => new ProfilebotImplmentation(null, new SlackProfileValidator(), adminUser));
+                Record.Exception(() => new ProfilebotImplmentation(null, new SlackProfileValidator(adminUser), adminUser));
 
             Assert.IsType<ArgumentNullException>(exception);
         }
