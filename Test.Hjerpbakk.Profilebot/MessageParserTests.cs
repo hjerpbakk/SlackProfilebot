@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot {
     public class MessageParserTests {
-        const string AdminUserId = "U1TBU8336";
+        const string AdminUserId = "AdminUserId";
 
         [Fact]
         public void ParseCommand_UnknownCommandAsAdmin() {
@@ -55,6 +55,14 @@ namespace Test.Hjerpbakk.Profilebot {
 
             Assert.IsType<NotifySingleProfileCommand>(command);
             Assert.Equal(slackUserToBeVerified, command.Payload);
+        }
+
+        [Fact]
+        public void ParseCommand_UnknownSingleUserCommand() {
+            var command = MessageParser.ParseCommand(
+                CreateMessage(AdminUserId, "Doit <@U4GHU76NA>"), AdminUserId);
+
+            Assert.IsType<UnknownCommand>(command);
         }
 
         public static SlackMessage CreateMessage(string senderId, string messageText) =>
