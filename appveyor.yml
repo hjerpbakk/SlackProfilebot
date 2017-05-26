@@ -31,7 +31,7 @@ after_test:
  - pip install codecov
  - codecov -f "coverage.xml"
  
- deploy_script:  
-  - docker build -t hjerpbakk/profilebot .
-  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
-  - docker push me/myfavoriteapp
+deploy_script:  
+ - docker build -t hjerpbakk/profilebot .
+ - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+ - docker push me/myfavoriteapp
