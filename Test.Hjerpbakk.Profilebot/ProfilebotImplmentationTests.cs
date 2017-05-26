@@ -236,6 +236,18 @@ namespace Test.Hjerpbakk.Profilebot {
         }
 
         [Fact]
+        public async Task InvalidMessage_AdminReportAlsoFails_DoesNotCrash() {
+            var creationResult = await CreateProfileBot(true);
+            var slackIntegration = creationResult.SlackIntegration;
+            slackIntegration.Setup(s => s.SendDirectMessage(adminUser.Id, It.IsRegex("I crashed"))).Throws(new Exception());
+            slackIntegration.Setup(s => s.SendDirectMessage(adminUser.Id, It.IsRegex("Available commands"))).Throws(new Exception());
+
+            slackIntegration.Raise(s => s.MessageReceived += null, new SlackMessage {User = new SlackUser {Id = adminUser.Id}, Text = "Message"});
+
+            slackIntegration.Verify(s => s.SendDirectMessage(adminUser.Id, It.IsRegex("I crashed")));
+        }
+
+        [Fact]
         public void Constructor_NoAdminId_Fails() {
             var slackIntegrationFake = new Mock<ISlackIntegration>();
             var slackProfileCheckerFake = new Mock<ISlackProfileValidator>();
