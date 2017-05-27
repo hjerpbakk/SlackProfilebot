@@ -37,7 +37,10 @@
     assembly_file_version: '{version}'
     assembly_informational_version: '{version}'
 
-  artifacts: Hjerpbakk.Profilebot.Runner\bin\Release\
+  artifacts: 
+    - path: Hjerpbakk.Profilebot.Runner\bin\Release\
+      name: Profilebot
+      type: zip
 
   before_build:
     - nuget restore
