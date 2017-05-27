@@ -67,7 +67,7 @@ You should now be able to send direct messages to Profilebot in your team's Slac
 
 ## Customize the profile validation
 
-In DIPS AS we use the following validation rules:
+At my company, [DIPS AS](https://dips.com) we use the following validation rules:
 
 - The email used must be a DIPS AS email
 - Username must be the same as in all other internal systems
