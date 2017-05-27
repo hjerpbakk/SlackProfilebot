@@ -52,7 +52,7 @@
     - codecov -f "coverage.xml"
   
   before_deploy:
-    - New-Item Hjerpbakk.Profilebot\bin\Release\Configuration\config.json -type file -value "{ `"apiToken`": `"env:SLACK_TOKEN`",	`"adminUserId`": `"env:ADMIN_USER_ID`" }"
+    - New-Item Hjerpbakk.Profilebot\bin\Release\Configuration\config.json -type file -value (Get-Content Hjerpbakk.Profilebot\bin\Release\Configuration\config.default.json).replace('[apiToken]', '$env:SLACK_TOKEN').replace('[adminUserId]', '$env:ADMIN_USER_ID')
     - docker build -t hjerpbakk/profilebot .
 
   deploy_script:
