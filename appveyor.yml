@@ -58,23 +58,23 @@
 
 # Other branches
 -
-version: 1.0.{build}
+  version: 1.0.{build}
 
-pull_requests:
-  do_not_increment_build_number: true
+  pull_requests:
+    do_not_increment_build_number: true
 
-image: Visual Studio 2017
+  image: Visual Studio 2017
 
-skip_commits:
-  files:
-    - README.md
+  skip_commits:
+    files:
+      - README.md
 
-configuration:
- - Debug
+  configuration:
+  - Debug
 
-before_build:
-  - nuget restore
+  before_build:
+    - nuget restore
 
-build:
-  project: Hjerpbakk.Profilebot.sln
-  verbosity: minimal
+  build:
+    project: Hjerpbakk.Profilebot.sln
+    verbosity: minimal
