@@ -24,7 +24,7 @@ If you are the admin of Profilebot, the following commands are available for you
 Validating will inform you of the user's profile status, while notify will also send a direct message to the specific user(s).
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/screens/AdminUsage.png" alt="Admin usage" />
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/AdminUsage.png" alt="Admin usage" />
 </p>
 
 ### As a regular user
