@@ -88,6 +88,10 @@ Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `ProfileValidati
 1. Create a new class and inherit from `ISlackProfileValidator`.
 2. In `Hjerpbakk.ProfileBot.Runner.ProfileBotHost`, edit the `IServiceContainer CompositionRoot(string slackToken, string adminUserId)` method. Instead of `serviceContainer.Register<ISlackProfileValidator, SlackProfileValidator>();`, register your own validation class.
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/dependency-graph.png" alt="Profilebot has a simple dependency graph" />
+</p>
+
 ## Running
 
 Thanks to [Topshelf](http://topshelf-project.com), running Profilebot either as a service or a console app is super easy.
