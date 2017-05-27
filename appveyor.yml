@@ -56,7 +56,7 @@
     - docker build -t hjerpbakk/profilebot .
 
   deploy_script:
-    - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+    - ps: docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
     - docker push hjerpbakk/profilebot
 
 # Other branches, only build and test
