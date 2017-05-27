@@ -45,18 +45,21 @@
     verbosity: minimal
 
   test_script:
-  - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Debug\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
+    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Release\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
   after_test:
-  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
-  - pip install codecov
-  - codecov -f "coverage.xml"
+    - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+    - pip install codecov
+    - codecov -f "coverage.xml"
   
-  # deploy_script:  
-  #  - docker build -t hjerpbakk/profilebot .
-  #  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
-  #  - docker push hjerpbakk/profilebot
+  before_deploy:
+    - New-Item Hjerpbakk.Profilebot\bin\Release\Configuration\config.json -type file -value (Get-Content Hjerpbakk.Profilebot\bin\Release\Configuration\config.default.json).replace('[apiToken]', '$env:SLACK_TOKEN').replace('[adminUserId]', '$env:ADMIN_USER_ID')
+    - docker build -t hjerpbakk/profilebot .
 
-# Other branches
+  deploy_script:
+    - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+    - docker push hjerpbakk/profilebot
+
+# Other branches, only build and test
 -
   version: 1.0.{build}
 
