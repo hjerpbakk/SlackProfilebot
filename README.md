@@ -83,8 +83,6 @@ Customising the profile validation is easy, and you have two choices for how to 
 
 Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `ProfileValidationResult ValidateProfile(SlackUser user)` method.
 
-The default implementation checks only that a first name i set in a user's profile.
-
 ### 2. Inherit from ISlackProfileValidator and create your own validator
 
 1. Create a new class and inherit from `ISlackProfileValidator`.
