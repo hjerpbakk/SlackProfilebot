@@ -1,5 +1,7 @@
 # Profilebot - the profile checking Slackbot for you!
 
+[![Build status](https://ci.appveyor.com/api/projects/status/498ui2cq6tpxg7c7/branch/master?svg=true)](https://ci.appveyor.com/project/Sankra/slackprofilebot/branch/master) [![codecov](https://codecov.io/gh/Sankra/SlackProfilebot/branch/master/graph/badge.svg)](https://codecov.io/gh/Sankra/SlackProfilebot)
+
 In a large Slack team, it's important that user profiles are completed enough for the users to recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app (Windows) or a Windows service.
 
 <p align="center">
@@ -31,7 +33,7 @@ As a regular user, anything you say will have the same effect: Profilebot will l
 
 ## Download & setup
 
-1. Clone the repository: `git clone https://github.com/DIPSASA/SlackProfilebot.git`
+1. Clone the repository: `git clone https://github.com/Sankra/SlackProfilebot.git`
 
 2. Go to `Hjerpbakk.Profilebot.Runner/Configuration` and create a copy of `config.default.json`. 
 
