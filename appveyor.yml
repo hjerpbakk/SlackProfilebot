@@ -1,4 +1,67 @@
+# Master with deploy
+-
+  branches:
+    only:
+      - master
+
+  version: 1.0.{build}
+
+  pull_requests:
+    do_not_increment_build_number: true
+
+  image: Visual Studio 2017
+
+  skip_commits:
+    files:
+      - README.md
+
+  environment:  
+    DOCKER_USER:
+      secure: i9T30C3Gi5+mGazI8PaXEA==
+    DOCKER_PASS:
+      secure: cIvXg8+kCw2JDjLaXUoKx/jAGsuIvnd6JeLDMcts7K8=
+    SLACK_TOKEN:
+      secure: +gRgRLkDDz+KHCNR+2HPcuTnobBNinqAxDbSfyd3kLuGc+qZXJmfCzes8YtFAa0L
+    ADMIN_USER_ID:
+      secure: pwPxIeKym+oeY9BQe/c+oA==
+  install:  
+    - docker version
+
+  configuration:
+  - Release
+
+  assembly_info:
+    patch: true
+    file: '**\AssemblyInfo.*'
+    assembly_version: '{version}'
+    assembly_file_version: '{version}'
+    assembly_informational_version: '{version}'
+
+  before_build:
+    - nuget restore
+
+  build:
+    project: Hjerpbakk.Profilebot.sln
+    verbosity: minimal
+
+  test_script:
+  - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Debug\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
+  after_test:
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -f "coverage.xml"
+  
+  # deploy_script:  
+  #  - docker build -t hjerpbakk/profilebot .
+  #  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+  #  - docker push hjerpbakk/profilebot
+
+# Other branches
+-
 version: 1.0.{build}
+
+pull_requests:
+  do_not_increment_build_number: true
 
 image: Visual Studio 2017
 
@@ -6,27 +69,8 @@ skip_commits:
   files:
     - README.md
 
-environment:  
-  DOCKER_USER:
-    secure: i9T30C3Gi5+mGazI8PaXEA==
-  DOCKER_PASS:
-    secure: cIvXg8+kCw2JDjLaXUoKx/jAGsuIvnd6JeLDMcts7K8=
-  SLACK_TOKEN:
-    secure: +gRgRLkDDz+KHCNR+2HPcuTnobBNinqAxDbSfyd3kLuGc+qZXJmfCzes8YtFAa0L
-  ADMIN_USER_ID:
-    secure: pwPxIeKym+oeY9BQe/c+oA==
-install:  
-  - docker version
-
 configuration:
- - Release
-
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
+ - Debug
 
 before_build:
   - nuget restore
@@ -34,15 +78,3 @@ before_build:
 build:
   project: Hjerpbakk.Profilebot.sln
   verbosity: minimal
-
-test_script:
- - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Debug\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
-after_test:
- - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
- - pip install codecov
- - codecov -f "coverage.xml"
- 
-# deploy_script:  
-#  - docker build -t hjerpbakk/profilebot .
-#  - docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
-#  - docker push hjerpbakk/profilebot
