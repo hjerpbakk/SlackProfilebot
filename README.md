@@ -5,7 +5,7 @@
 In a large Slack team, it's important that user profiles are completed enough for the users to recognise each other. Profilebot is a simple bot used for validating Slack user profiles. It is written in C# and it's easy to extend for all your profile checking needs. It runs out of the box either as a console app (Windows) or a Windows service.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/logo.png" alt="Profilebot" width="50%" />
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/logo.png" alt="Profilebot" width="256" />
 </p>
 
 ## Usage in Slack
@@ -24,7 +24,7 @@ If you are the admin of Profilebot, the following commands are available for you
 Validating will inform you of the user's profile status, while notify will also send a direct message to the specific user(s).
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/AdminUsage.png" alt="Admin usage" />
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/AdminUsage.png" alt="Admin usage" width="834" />
 </p>
 
 ### As a regular user
@@ -89,7 +89,7 @@ Open `Hjerpbakk.ProfileBot.SlackProfileValidator`  and edit the `ProfileValidati
 2. In `Hjerpbakk.ProfileBot.Runner.ProfileBotHost`, edit the `IServiceContainer CompositionRoot(string slackToken, string adminUserId)` method. Instead of `serviceContainer.Register<ISlackProfileValidator, SlackProfileValidator>();`, register your own validation class.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/dependency-graph.png" alt="Profilebot has a simple dependency graph" />
+<img src="https://raw.githubusercontent.com/Sankra/SlackProfilebot/master/img/dependency-graph.png" alt="Profilebot has a simple dependency graph" width="605" />
 </p>
 
 ## Running
