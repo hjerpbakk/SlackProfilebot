@@ -20,6 +20,8 @@ namespace Hjerpbakk.ProfileBot.Runner {
                     service.WhenStopped(n => n.Stop());
                 });
 
+                host.UseNLog();
+
                 host.RunAsNetworkService();
 
                 host.SetDisplayName("Slack Profilebot");
