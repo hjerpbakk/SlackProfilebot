@@ -12,7 +12,6 @@ namespace Hjerpbakk.ProfileBot.Runner {
 
         static void Main() {
             logger.Info("Starting Profilebot.");
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             HostFactory.Run(host => {
                 host.Service<ProfileBotHost>(service => {
                     service.ConstructUsing(name => new ProfileBotHost());
@@ -22,6 +21,8 @@ namespace Hjerpbakk.ProfileBot.Runner {
 
                 host.UseNLog();
 
+                host.OnException(exception => { logger.Fatal(exception, "Fatal error, Profilebot going down."); });
+
                 host.RunAsNetworkService();
 
                 host.SetDisplayName("Slack Profilebot");
@@ -29,17 +30,6 @@ namespace Hjerpbakk.ProfileBot.Runner {
                 host.SetDescription("Validates the profile of Slack users according to your team's rules.");
             });
             logger.Info("Stopping Profilebot.");
-        }
-
-        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
-            const string FatalError = "Fatal error, Profilebot going down.";
-            var exception = e.ExceptionObject as Exception;
-            if (exception == null) {
-                logger.Fatal(FatalError);
-            }
-            else {
-                logger.Fatal(exception, FatalError);
-            }
         }
     }
 }
