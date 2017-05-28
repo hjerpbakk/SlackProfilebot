@@ -28,6 +28,15 @@ namespace Hjerpbakk.ProfileBot.Runner {
         }
 
         static IServiceContainer CompositionRoot(string slackToken, string adminUserId) {
+            if (string.IsNullOrEmpty(slackToken)) {
+                throw new ArgumentException(nameof(slackToken));
+            }
+
+            if (string.IsNullOrEmpty(adminUserId))
+            {
+                throw new ArgumentException(nameof(adminUserId));
+            }
+
             var serviceContainer = new ServiceContainer();
 
             serviceContainer.RegisterInstance(slackToken);
