@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading;
+using Hjerpbakk.ProfileBot.Runner.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
 using NLog;
 using Topshelf;
 
@@ -12,6 +14,11 @@ namespace Hjerpbakk.ProfileBot.Runner {
         }
 
         static void Main() {
+            var configurationReader = new ConfigReader();
+            if (!string.IsNullOrEmpty(configurationReader.ApplicationInsightsInstrumentationKey)) {
+                TelemetryConfiguration.Active.InstrumentationKey = configurationReader.ApplicationInsightsInstrumentationKey;
+            }
+
             var keepAliveTimer = new Timer(HeartBeat, null, TimeSpan.Zero, TimeSpan.FromSeconds(100));
             logger.Info("Starting heartbeat.");
 
@@ -19,7 +26,7 @@ namespace Hjerpbakk.ProfileBot.Runner {
             HostFactory.Run(host => {
                 host.Service<ProfileBotHost>(service => {
                     service.ConstructUsing(name => new ProfileBotHost());
-                    service.WhenStarted(n => { n.Start(); });
+                    service.WhenStarted(n => { n.Start(configurationReader.SlackApiKey, configurationReader.AdminUserId); });
                     service.WhenStopped(n => n.Stop());
                 });
 

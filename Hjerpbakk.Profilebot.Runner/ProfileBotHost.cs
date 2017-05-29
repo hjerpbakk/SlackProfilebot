@@ -1,6 +1,5 @@
 ﻿using System;
 using Hjerpbakk.ProfileBot.Contracts;
-using Hjerpbakk.ProfileBot.Runner.Configuration;
 using LightInject;
 using SlackConnector;
 
@@ -8,9 +7,16 @@ namespace Hjerpbakk.ProfileBot.Runner {
     public class ProfileBotHost {
         ProfilebotImplmentation profilebot;
 
-        public void Start() {
-            var configurationReader = new ConfigReader();
-            var serviceContainer = CompositionRoot(configurationReader.SlackApiKey, configurationReader.AdminUserId);
+        public void Start(string slackToken, string adminUserId) {
+            if (string.IsNullOrEmpty(slackToken)) {
+                throw new ArgumentException(nameof(slackToken));
+            }
+
+            if (string.IsNullOrEmpty(adminUserId)) {
+                throw new ArgumentException(nameof(adminUserId));
+            }
+
+            var serviceContainer = CompositionRoot(slackToken, adminUserId);
             profilebot = serviceContainer.GetInstance<ProfilebotImplmentation>();
             profilebot
                 .Connect()
@@ -28,15 +34,6 @@ namespace Hjerpbakk.ProfileBot.Runner {
         }
 
         static IServiceContainer CompositionRoot(string slackToken, string adminUserId) {
-            if (string.IsNullOrEmpty(slackToken)) {
-                throw new ArgumentException(nameof(slackToken));
-            }
-
-            if (string.IsNullOrEmpty(adminUserId))
-            {
-                throw new ArgumentException(nameof(adminUserId));
-            }
-
             var serviceContainer = new ServiceContainer();
 
             serviceContainer.RegisterInstance(slackToken);

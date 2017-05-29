@@ -15,6 +15,8 @@ namespace Hjerpbakk.ProfileBot.Runner.Configuration {
 
         public string AdminUserId => currentJObject.Value.Value<string>("adminUserId");
 
+        public string ApplicationInsightsInstrumentationKey => currentJObject.Value.Value<string>("applicationInsightsInstrumentationKey");
+
         static JObject GetJObject() {
             var assemblyLocation = AssemblyLocation();
             var fileName = Path.Combine(assemblyLocation, @"Configuration\config.json");

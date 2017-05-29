@@ -1,4 +1,5 @@
 ﻿{
 	"apiToken": "[apiToken]",
-	"adminUserId": "[adminUserId]"  
+  "adminUserId": "[adminUserId]",
+  "applicationInsightsInstrumentationKey" : "[applicationInsightsInstrumentationKey]" 
 }
