@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hjerpbakk.Profilebot.Configuration;
 using Hjerpbakk.ProfileBot.Commands;
 using Hjerpbakk.ProfileBot.Contracts;
 using NLog;
@@ -126,7 +127,7 @@ namespace Hjerpbakk.ProfileBot {
 
         async Task AnswerRegularUser(SlackUser user) {
             await slackIntegration.SendDirectMessage(user.Id, "Checking your profile");
-            var verificationResult = slackProfileValidator.ValidateProfile(user);
+            var verificationResult = await slackProfileValidator.ValidateProfile(user);
             if (verificationResult.IsValid) {
                 await slackIntegration.SendDirectMessage(user.Id,
                     $"Well done <@{user.Id}>, your profile is complete");
@@ -146,7 +147,7 @@ namespace Hjerpbakk.ProfileBot {
             }
             var usersWithIncompleteProfiles = new List<ProfileValidationResult>();
             foreach (var user in await slackIntegration.GetAllUsers()) {
-                var verificationResult = slackProfileValidator.ValidateProfile(user);
+                var verificationResult = await slackProfileValidator.ValidateProfile(user);
                 if (verificationResult.IsValid) {
                     continue;
                 }
@@ -170,7 +171,7 @@ namespace Hjerpbakk.ProfileBot {
             var verb = notify ? "Notifying" : "Validating";
             await slackIntegration.SendDirectMessage(sender, $"{verb} {user.SlackUserIdAsString}");
             var userToCheck = await slackIntegration.GetUser(user.UserId);
-            var verificationResult = slackProfileValidator.ValidateProfile(userToCheck);
+            var verificationResult = await slackProfileValidator.ValidateProfile(userToCheck);
             if (verificationResult.IsValid) {
                 await slackIntegration.SendDirectMessage(sender,
                     $"{user.SlackUserIdAsString} has a complete profile");

@@ -1,5 +1,6 @@
 ﻿{
 	"apiToken": "[apiToken]",
   "adminUserId": "[adminUserId]",
-  "applicationInsightsInstrumentationKey" : "[applicationInsightsInstrumentationKey]" 
+  "applicationInsightsInstrumentationKey": "[applicationInsightsInstrumentationKey]",
+  "faceAPIAccessKey":  "[faceAPIAccessKey]" 
 }

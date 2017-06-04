@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Hjerpbakk.Profilebot.Configuration;
 using Hjerpbakk.ProfileBot;
 using Hjerpbakk.ProfileBot.Contracts;
 using SlackConnector.Models;
@@ -11,127 +14,127 @@ namespace Test.Hjerpbakk.Profilebot {
         readonly ISlackProfileValidator slackProfileValidator;
 
         public SlackProfileValidatorTests() {
-            slackProfileValidator = new SlackProfileValidator(new AdminUser("U1TBU8336"));
+            slackProfileValidator = new SlackProfileValidator(new AdminUser("U1TBU8336"), null);
         }
 
         [Fact]
-        public void VerifyProfile_SlackUserIsNull_Throws() {
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(null));
+        public async Task VerifyProfile_SlackUserIsNull_Throws() {
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(null));
 
             Assert.IsType<ArgumentNullException>(exception);
         }
 
         [Fact]
         public void VerifyProfile_AdminIdIsNull_Throws() {
-            var exception = Record.Exception(() => new SlackProfileValidator(new AdminUser()));
+            var exception = Record.Exception(() => new SlackProfileValidator(new AdminUser(), null));
 
             Assert.IsType<ArgumentException>(exception);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoId_Throws() {
+        public async Task VerifyProfile_HasNoId_Throws() {
             var user = new SlackUser();
 
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(user));
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(user));
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Contains("Id cannot be empty.", exception.Message);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoName_Throws() {
+        public async Task VerifyProfile_HasNoName_Throws() {
             var user = new SlackUser {Id = UserId};
 
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(user));
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(user));
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Contains("Name cannot be empty.", exception.Message);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoMail_Invalid() {
+        public async Task VerifyProfile_HasNoMail_Invalid() {
             var user = CreateUser();
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyEmailExist(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasOtherThanDIPSMail_Invalid() {
+        public async Task VerifyProfile_HasOtherThanDIPSMail_Invalid() {
             var user = CreateUser();
             user.Email = "runar@hjerpbakk.com";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyOtherThanDIPSMail(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasWrongDIPSMail_Invalid() {
+        public async Task VerifyProfile_HasWrongDIPSMail_Invalid() {
             var user = CreateUser();
             user.Email = "runar@dips.no";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyWrongDIPSMail(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasMissingFirstName_Invalid() {
+        public async Task VerifyProfile_HasMissingFirstName_Invalid() {
             var user = CreateUser();
             user.Email = "roh@dips.no";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyMissingFirstName(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasMissingLastName_Invalid() {
+        public async Task VerifyProfile_HasMissingLastName_Invalid() {
             var user = CreateUser();
             user.Email = "roh@dips.no";
             user.FirstName = "Runar";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyMissingLastName(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasMissingWhatIDo_Invalid() {
+        public async Task VerifyProfile_HasMissingWhatIDo_Invalid() {
             var user = CreateUser();
             user.Email = "roh@dips.no";
             user.FirstName = "Runar";
             user.LastName = "Hjerpbakk";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyMissingWhatIDo(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasMissingImage_Invalid() {
+        public async Task VerifyProfile_HasMissingImage_Invalid() {
             var user = CreateUser();
             user.Email = "roh@dips.no";
             user.FirstName = "Runar";
             user.LastName = "Hjerpbakk";
             user.WhatIDo = "Software Engineering Manager";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyMissingImage(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_CompleteProfile_Valid() {
+        public async Task VerifyProfile_CompleteProfile_Valid() {
             var user = CreateUser();
             user.Email = "roh@dips.no";
             user.FirstName = "Runar";
@@ -139,7 +142,7 @@ namespace Test.Hjerpbakk.Profilebot {
             user.WhatIDo = "Software Engineering Manager";
             user.Image = "http://image.com";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             Assert.Equal(true, validationResult.IsValid);
             Assert.Null(validationResult.UserId);
@@ -147,10 +150,10 @@ namespace Test.Hjerpbakk.Profilebot {
         }
 
         [Fact]
-        public void VerifyProfile_EverythingMissing_InvalidAndAllErrorsReturned() {
+        public async Task VerifyProfile_EverythingMissing_InvalidAndAllErrorsReturned() {
             var user = CreateUser();
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyEmailExist(validationResult);

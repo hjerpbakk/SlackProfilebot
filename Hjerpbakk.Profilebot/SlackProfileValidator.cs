@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
+using Hjerpbakk.Profilebot.Configuration;
 using SlackConnector.Models;
 using Hjerpbakk.ProfileBot.Contracts;
+using Hjerpbakk.ProfileBot.FaceDetection;
 
 namespace Hjerpbakk.ProfileBot {
     /// <summary>
@@ -9,17 +12,22 @@ namespace Hjerpbakk.ProfileBot {
     /// </summary>
     public class SlackProfileValidator : ISlackProfileValidator {
         readonly string adminUserId;
+        readonly IFaceDetectionClient faceDetectionClient;
 
         /// <summary>
         /// Creates the SlackProfileValidator.
         /// </summary>
         /// <param name="adminUser">The admin of this Slack team.</param>
-        public SlackProfileValidator(AdminUser adminUser) {
+        /// <param name="faceDetectionClient"></param>
+        public SlackProfileValidator(AdminUser adminUser, IFaceDetectionClient faceDetectionClient) {
             if (string.IsNullOrEmpty(adminUser.Id)) {
                 throw new ArgumentException(nameof(adminUser.Id));
             }
 
+            // TODO: Feilhåndtering
+
             adminUserId = adminUser.Id;
+            this.faceDetectionClient = faceDetectionClient;
         }
 
         /// <summary>
@@ -27,7 +35,7 @@ namespace Hjerpbakk.ProfileBot {
         /// </summary>
         /// <param name="user">The user to be validated.</param>
         /// <returns>The result of the validation.</returns>
-        public ProfileValidationResult ValidateProfile(SlackUser user) {
+        public async Task<ProfileValidationResult> ValidateProfile(SlackUser user) {
             Verify(user);
 
             var errors = new StringBuilder();
@@ -46,7 +54,7 @@ namespace Hjerpbakk.ProfileBot {
                 errors.AppendLine("Feltet \"What I do\" må inneholde team og hva du kan i DIPS.");
             }
 
-            ValidateProfileImage(user, errors);
+            await ValidateProfileImage(user, errors);
 
             var actualErrors = errors.ToString();
             return actualErrors.Length == 0 || user.IsBot || user.Deleted || user.Name == "slackbot"
@@ -88,10 +96,19 @@ namespace Hjerpbakk.ProfileBot {
             }
         }
 
-        static void ValidateProfileImage(SlackUser user, StringBuilder errors) {
+        async Task ValidateProfileImage(SlackUser user, StringBuilder errors) {
             if (string.IsNullOrEmpty(user.Image)) {
                 errors.AppendLine("Legg inn et profilbilde slik at folk kjenner deg igjen.");
+                return;
             }
+
+            // TODO: tests
+            var imageValidationResult = await faceDetectionClient.ValidateProfileImage(user);
+            if (imageValidationResult.IsValid) {
+                return;
+            }
+
+            errors.AppendLine(imageValidationResult.Errors);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Hjerpbakk.ProfileBot.Runner {
             HostFactory.Run(host => {
                 host.Service<ProfileBotHost>(service => {
                     service.ConstructUsing(name => new ProfileBotHost());
-                    service.WhenStarted(n => { n.Start(configurationReader.SlackApiKey, configurationReader.AdminUserId); });
+                    service.WhenStarted(n => { n.Start(configurationReader.SlackApiKey, configurationReader.AdminUser, configurationReader.FaceAPI); });
                     service.WhenStopped(n => n.Stop());
                 });
 

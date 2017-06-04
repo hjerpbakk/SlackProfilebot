@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Hjerpbakk.Profilebot.Configuration;
 using Newtonsoft.Json.Linq;
 
 namespace Hjerpbakk.ProfileBot.Runner.Configuration {
@@ -13,9 +14,11 @@ namespace Hjerpbakk.ProfileBot.Runner.Configuration {
 
         public string SlackApiKey => currentJObject.Value.Value<string>("apiToken");
 
-        public string AdminUserId => currentJObject.Value.Value<string>("adminUserId");
+        public AdminUser AdminUser => new AdminUser(currentJObject.Value.Value<string>("adminUserId"));
 
         public string ApplicationInsightsInstrumentationKey => currentJObject.Value.Value<string>("applicationInsightsInstrumentationKey");
+
+        public FaceDetectionAPI FaceAPI => new FaceDetectionAPI(currentJObject.Value.Value<string>("faceAPIAccessKey"));
 
         static JObject GetJObject() {
             var assemblyLocation = AssemblyLocation();

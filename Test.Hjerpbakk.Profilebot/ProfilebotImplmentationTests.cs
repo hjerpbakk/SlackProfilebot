@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
+using Hjerpbakk.Profilebot.Configuration;
 using Hjerpbakk.ProfileBot;
 using Hjerpbakk.ProfileBot.Contracts;
 using Moq;
@@ -26,7 +27,7 @@ namespace Test.Hjerpbakk.Profilebot {
         [Fact]
         public void Constructor_NoSlackIntegration_Fails() {
             var exception =
-                Record.Exception(() => new ProfilebotImplmentation(null, new SlackProfileValidator(adminUser), adminUser));
+                Record.Exception(() => new ProfilebotImplmentation(null, new SlackProfileValidator(adminUser, null), adminUser));
 
             Assert.IsType<ArgumentNullException>(exception);
         }
@@ -64,7 +65,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             creationResult.SlackIntegration.Setup(s => s.GetAllUsers()).ReturnsAsync(users);
             creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>()))
-                .Returns(ProfileValidationResult.CreateValid());
+                .ReturnsAsync(ProfileValidationResult.CreateValid());
 
             creationResult.SlackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "validate all users"));
@@ -78,7 +79,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             creationResult.SlackIntegration.Setup(s => s.GetAllUsers()).ReturnsAsync(users);
             creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>()))
-                .Returns<SlackUser>(s => new ProfileValidationResult(false, s.Id, ""));
+                .Returns<SlackUser>(s => Task.FromResult(new ProfileValidationResult(false, s.Id, "")));
 
             creationResult.SlackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "validate all users"));
@@ -94,7 +95,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetAllUsers()).ReturnsAsync(users);
             creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>()))
-                .Returns<SlackUser>(s => new ProfileValidationResult(false, s.Id, $"Error {s.Id}"));
+                .Returns<SlackUser>(s => Task.FromResult(new ProfileValidationResult(false, s.Id, $"Error {s.Id}")));
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "Notify all users"));
@@ -115,7 +116,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser(adminUser.Id)).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns(ProfileValidationResult.CreateValid());
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).ReturnsAsync(ProfileValidationResult.CreateValid());
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "Validate <@U1TBU8336>"));
@@ -130,7 +131,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser(adminUser.Id)).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => new ProfileValidationResult(false, s.Id, $"Error {s.Id}"));
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => Task.FromResult(new ProfileValidationResult(false, s.Id, $"Error {s.Id}")));
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "Validate <@U1TBU8336>"));
@@ -145,7 +146,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser(adminUser.Id)).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns(ProfileValidationResult.CreateValid());
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).ReturnsAsync(ProfileValidationResult.CreateValid());
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "Notify <@U1TBU8336>"));
@@ -160,7 +161,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser(adminUser.Id)).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => new ProfileValidationResult(false, s.Id, $"Error {s.Id}"));
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => Task.FromResult(new ProfileValidationResult(false, s.Id, $"Error {s.Id}")));
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser.Id, "Notify <@U1TBU8336>"));
@@ -176,7 +177,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser("U1TBU8337")).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns(ProfileValidationResult.CreateValid());
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).ReturnsAsync(ProfileValidationResult.CreateValid());
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage("U1TBU8337", "Any message"));
@@ -191,7 +192,7 @@ namespace Test.Hjerpbakk.Profilebot {
             var creationResult = await CreateProfileBot(true);
             var slackIntegration = creationResult.SlackIntegration;
             slackIntegration.Setup(s => s.GetUser("U1TBU8337")).ReturnsAsync(user);
-            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => new ProfileValidationResult(false, s.Id, $"Error {s.Id}"));
+            creationResult.SlackProfileChecker.Setup(s => s.ValidateProfile(It.IsAny<SlackUser>())).Returns<SlackUser>(s => Task.FromResult(new ProfileValidationResult(false, s.Id, $"Error {s.Id}")));
 
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage("U1TBU8337", "Any message"));

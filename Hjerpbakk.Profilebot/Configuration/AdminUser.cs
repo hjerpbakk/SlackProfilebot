@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hjerpbakk.ProfileBot {
+namespace Hjerpbakk.Profilebot.Configuration {
     /// <summary>
     /// Represents an admin user in Slack.
     /// </summary>

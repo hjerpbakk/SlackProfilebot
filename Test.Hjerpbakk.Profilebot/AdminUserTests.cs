@@ -1,4 +1,5 @@
 ﻿using System;
+using Hjerpbakk.Profilebot.Configuration;
 using Hjerpbakk.ProfileBot;
 using Xunit;
 

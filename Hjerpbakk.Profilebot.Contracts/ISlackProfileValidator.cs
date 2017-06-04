@@ -1,4 +1,5 @@
-﻿using SlackConnector.Models;
+﻿using System.Threading.Tasks;
+using SlackConnector.Models;
 
 namespace Hjerpbakk.ProfileBot.Contracts {
     /// <summary>
@@ -10,6 +11,6 @@ namespace Hjerpbakk.ProfileBot.Contracts {
         /// </summary>
         /// <param name="user">The user to be validated.</param>
         /// <returns>The result of the validation.</returns>
-        ProfileValidationResult ValidateProfile(SlackUser user);
+        Task<ProfileValidationResult> ValidateProfile(SlackUser user);
     }
 }
