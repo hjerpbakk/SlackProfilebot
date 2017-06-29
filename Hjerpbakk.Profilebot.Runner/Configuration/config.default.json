@@ -1,6 +1,11 @@
 ﻿{
-	"apiToken": "[apiToken]",
+  "apiToken": "[apiToken]",
   "adminUserId": "[adminUserId]",
   "applicationInsightsInstrumentationKey": "[applicationInsightsInstrumentationKey]",
-  "faceAPIAccessKey":  "[faceAPIAccessKey]" 
+  "faceAPIAccessKey": "[faceAPIAccessKey]",
+  "faceAPIURL": "[faceAPIURL]",
+  "blobStorageAccessKey": "[blobStorageAccessKey]",
+  "blobStorageAccountName": "[blobStorageAccountName]",
+  "endpointSuffix": "[endpointSuffix]",
+  "heartBeat": "false"
 }

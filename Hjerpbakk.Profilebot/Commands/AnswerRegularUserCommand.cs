@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hjerpbakk.ProfileBot.Commands {
+namespace Hjerpbakk.Profilebot.Commands {
     internal class AnswerRegularUserCommand : ProfileBotCommand {
         static readonly Lazy<AnswerRegularUserCommand> instance;
 
@@ -10,7 +10,8 @@ namespace Hjerpbakk.ProfileBot.Commands {
 
         AnswerRegularUserCommand() { }
 
-        public static AnswerRegularUserCommand Create() =>
-            instance.Value;
+        public static AnswerRegularUserCommand Create() {
+            return instance.Value;
+        }
     }
 }

@@ -24,6 +24,14 @@
       secure: +gRgRLkDDz+KHCNR+2HPcuTnobBNinqAxDbSfyd3kLuGc+qZXJmfCzes8YtFAa0L
     ADMIN_USER_ID:
       secure: pwPxIeKym+oeY9BQe/c+oA==
+    FACE_API_ACCESS_KEY:
+      secure: GSyy8Y/eMnQ9Hf7HMf9dNiDW6ZdE/uXSEFMJzvLHE8TS5GuZDTOyrALldmdXGi+o
+    FACE_API_URL:
+      secure: IR/gw0Y63PY29gIFW+l5seKvxmj4Upa6ZCS6MImeoYos3L9L1aOcYSwmVWilDof5x+BVi7NGUhvyEAR8P1AxoA==
+    INSIGHTS:
+      secure: 75oaXQhx7Z0tW7xqn8XuoRd0AV1hwAf7u5W9XCK5bje2DxaptjfPVJ7qdOSw+7mV
+    BLOB_STORAGE:
+      secure: 2RQPegoJG+fJAlSF8szG4HAYxaF8cNrZ4f95TdQTJt1qjPHEf4wMpINLGLgsOhQAkpUtjR+DjeyIHIP4ZDGkIAjN9cp1uDwm5nTSrFkVlC7P3IBWrDdrti40Q+7swpI/
   install:  
     - docker version
 
@@ -57,7 +65,7 @@
     - codecov -f "coverage.xml"
   
   before_deploy:
-    - ps: (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[apiToken]', $env:SLACK_TOKEN).replace('[adminUserId]', $env:ADMIN_USER_ID) | Set-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json
+    - ps: (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[apiToken]', $env:SLACK_TOKEN).replace('[adminUserId]', $env:ADMIN_USER_ID).replace('[faceAPIAccessKey]', $env:FACE_API_ACCESS_KEY).replace('[faceAPIURL]', $env:FACE_API_URL).replace('[applicationInsightsInstrumentationKey]', $env:INSIGHTS).replace('[blobStorageAccessKey]', $env:BLOB_STORAGE).replace('[blobStorageAccountName]', 'profilebotdb').replace('[endpointSuffix]', 'core.windows.net') | Set-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json
     - docker build -t hjerpbakk/profilebot .
 
   deploy_script:

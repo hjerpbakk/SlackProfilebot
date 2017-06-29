@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hjerpbakk.ProfileBot.Commands {
+namespace Hjerpbakk.Profilebot.Commands {
     internal class UnknownCommand : ProfileBotCommand {
         static readonly Lazy<UnknownCommand> instance;
 
@@ -10,7 +10,8 @@ namespace Hjerpbakk.ProfileBot.Commands {
 
         UnknownCommand() { }
 
-        public static UnknownCommand Create() =>
-            instance.Value;
+        public static UnknownCommand Create() {
+            return instance.Value;
+        }
     }
 }

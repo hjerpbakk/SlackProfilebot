@@ -1,71 +1,101 @@
-﻿using Hjerpbakk.ProfileBot;
-using Hjerpbakk.ProfileBot.Commands;
+﻿using System.Collections.Generic;
+using Hjerpbakk.Profilebot;
+using Hjerpbakk.Profilebot.Commands;
 using SlackConnector.Models;
 using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot {
     public class MessageParserTests {
-        const string AdminUserId = "AdminUserId";
+        readonly SlackUser adminUser;
 
-        [Fact]
-        public void ParseCommand_UnknownCommandAsAdmin() {
-            var command = MessageParser.ParseCommand(CreateMessage(AdminUserId, "I don't know this API..."), AdminUserId);
+        public static IEnumerable<object[]> InvalidSlackIds = new[] {
+            new object[] {"U1TBU8336"},
+            new object[] {"<U1TBU8336"},
+            new object[] {"<@U1TBU8336"}
+        };
+
+        public MessageParserTests() {
+            adminUser = new SlackUser {Id = "AdminUserId"};
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidSlackIds))]
+        public void GetSlackUserFromFormattedUserId(string badUserId) {
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "Whitelist " + badUserId), adminUser);
 
             Assert.IsType<UnknownCommand>(command);
         }
 
         [Fact]
         public void ParseCommand_AnswerNormalUserCommand() {
-            var command = MessageParser.ParseCommand(CreateMessage("NotAdmin", "I don't know this API..."), AdminUserId);
+            var command = MessageParser.ParseCommand(CreateMessage(new SlackUser {Id = "NotAdmin"}, "I don't know this API..."), adminUser);
 
             Assert.IsType<AnswerRegularUserCommand>(command);
         }
 
         [Fact]
-        public void ParseCommand_VerifyAllUsers() {
-            var command = MessageParser.ParseCommand(CreateMessage(AdminUserId, "Validate all users"), AdminUserId);
-
-            Assert.IsType<ValidateAllProfilesCommand>(command);
-        }
-
-        [Fact]
         public void ParseCommand_NotifuAllUsers() {
-            var command = MessageParser.ParseCommand(CreateMessage(AdminUserId, "Notify all users"), AdminUserId);
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "Notify all users"), adminUser);
 
             Assert.IsType<NotifyAllProfilesCommand>(command);
         }
 
         [Fact]
-        public void ParseCommand_VerifySingleUser() {
-            var slackUserToBeVerified = new SlackStringUser("<@U4GHU76NA>");
+        public void ParseCommand_NotifySingleUser() {
+            var slackUserToBeVerified = new SlackUser {Id = "U4GHU76NA"};
 
-            var command = (ProfileBotCommand<SlackStringUser>) MessageParser.ParseCommand(
-                CreateMessage(AdminUserId, "Validate <@U4GHU76NA>"), AdminUserId);
+            var command = (ProfileBotCommand<SlackUser>) MessageParser.ParseCommand(
+                CreateMessage(adminUser, "Notify <@U4GHU76NA>"), adminUser);
 
-            Assert.IsType<ValidateSingleProfileCommand>(command);
-            Assert.Equal(slackUserToBeVerified, command.Payload);
+            Assert.IsType<NotifySingleProfileCommand>(command);
+            Assert.Equal(slackUserToBeVerified.Id, command.Payload.Id);
         }
 
         [Fact]
-        public void ParseCommand_NotifySingleUser() {
-            var slackUserToBeVerified = new SlackStringUser("<@U4GHU76NA>");
+        public void ParseCommand_UnknownCommandAsAdmin() {
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "I don't know this API..."), adminUser);
 
-            var command = (ProfileBotCommand<SlackStringUser>) MessageParser.ParseCommand(
-                CreateMessage(AdminUserId, "Notify <@U4GHU76NA>"), AdminUserId);
-
-            Assert.IsType<NotifySingleProfileCommand>(command);
-            Assert.Equal(slackUserToBeVerified, command.Payload);
+            Assert.IsType<UnknownCommand>(command);
         }
 
         [Fact]
         public void ParseCommand_UnknownSingleUserCommand() {
             var command = MessageParser.ParseCommand(
-                CreateMessage(AdminUserId, "Doit <@U4GHU76NA>"), AdminUserId);
+                CreateMessage(adminUser, "Doit <@U4GHU76NA>"), adminUser);
 
             Assert.IsType<UnknownCommand>(command);
         }
 
-        public static SlackMessage CreateMessage(string senderId, string messageText) =>
-            new SlackMessage {User = new SlackUser {Id = senderId}, Text = messageText};
+        [Fact]
+        public void ParseCommand_VerifyAllUsers() {
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "Validate all users"), adminUser);
+
+            Assert.IsType<ValidateAllProfilesCommand>(command);
+        }
+
+        [Fact]
+        public void ParseCommand_VerifySingleUser() {
+            var slackUserToBeVerified = new SlackUser {Id = "U4GHU76NA"};
+
+            var command = (ProfileBotCommand<SlackUser>) MessageParser.ParseCommand(
+                CreateMessage(adminUser, "Validate <@U4GHU76NA>"), adminUser);
+
+            Assert.IsType<ValidateSingleProfileCommand>(command);
+            Assert.Equal(slackUserToBeVerified.Id, command.Payload.Id);
+        }
+
+        [Fact]
+        public void ParseCommand_WhitelistSingleUser() {
+            var slackUserToBeVerified = new SlackUser {Id = "U4GHU76NA"};
+
+            var command = (ProfileBotCommand<SlackUser>) MessageParser.ParseCommand(
+                CreateMessage(adminUser, "Whitelist <@U4GHU76NA>"), adminUser);
+
+            Assert.IsType<WhitelistSingleProfileCommand>(command);
+            Assert.Equal(slackUserToBeVerified.Id, command.Payload.Id);
+        }
+
+        public static SlackMessage CreateMessage(SlackUser sender, string messageText) =>
+            new SlackMessage {User = sender, Text = messageText};
     }
 }

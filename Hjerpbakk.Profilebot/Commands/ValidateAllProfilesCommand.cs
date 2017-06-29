@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hjerpbakk.ProfileBot.Commands {
+namespace Hjerpbakk.Profilebot.Commands {
     internal class ValidateAllProfilesCommand : ProfileBotCommand {
         static readonly Lazy<ValidateAllProfilesCommand> instance;
 
@@ -10,7 +10,8 @@ namespace Hjerpbakk.ProfileBot.Commands {
 
         ValidateAllProfilesCommand() { }
 
-        public static ValidateAllProfilesCommand Create() =>
-            instance.Value;
+        public static ValidateAllProfilesCommand Create() {
+            return instance.Value;
+        }
     }
 }

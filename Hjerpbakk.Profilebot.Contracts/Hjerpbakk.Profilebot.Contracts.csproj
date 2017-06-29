@@ -100,10 +100,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISlackIntegration.cs" />
     <Compile Include="ISlackProfileValidator.cs" />
     <Compile Include="ProfileValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SlackUserExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

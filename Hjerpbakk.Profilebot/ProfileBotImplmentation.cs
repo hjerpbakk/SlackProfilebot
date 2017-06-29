@@ -1,41 +1,42 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Hjerpbakk.Profilebot.Configuration;
-using Hjerpbakk.ProfileBot.Commands;
-using Hjerpbakk.ProfileBot.Contracts;
+using Hjerpbakk.Profilebot.Commands;
+using Hjerpbakk.Profilebot.Contracts;
+using Hjerpbakk.Profilebot.FaceDetection;
+using Hjerpbakk.Profilebot.FaceDetection.Report;
 using NLog;
 using SlackConnector.Models;
 
-namespace Hjerpbakk.ProfileBot {
+namespace Hjerpbakk.Profilebot {
     /// <summary>
-    /// A Slack-bot which verifies user profiles. The bot get its commands
-    /// from direct messages. If the bot doesn't understand, it will list
-    /// its available commands.
+    ///     A Slack-bot which verifies user profiles. The bot get its commands
+    ///     from direct messages. If the bot doesn't understand, it will list
+    ///     its available commands.
     /// </summary>
     public sealed class ProfilebotImplmentation : IDisposable {
         static readonly Logger logger;
 
+        readonly SlackUser adminUser;
+        readonly IFaceWhitelist faceWhitelist;
         readonly ISlackIntegration slackIntegration;
-
         readonly ISlackProfileValidator slackProfileValidator;
-        readonly string adminUserId;
 
         /// <summary>
-        /// Gets the logger for this class.
+        ///     Gets the logger for this class.
         /// </summary>
         static ProfilebotImplmentation() {
             logger = LogManager.GetCurrentClassLogger();
         }
 
         /// <summary>
-        /// Creates the Slack-bot.
+        ///     Creates the Slack-bot.
         /// </summary>
         /// <param name="slackIntegration">Used for talking to the Slack APIs.</param>
         /// <param name="slackProfileValidator">Used for checking user profiles for completeness.</param>
         /// <param name="adminUser">Used for sending the results to the Slack admin.</param>
-        public ProfilebotImplmentation(ISlackIntegration slackIntegration, ISlackProfileValidator slackProfileValidator, AdminUser adminUser) {
+        /// <param name="faceWhitelist">Knows about whitelisted users.</param>
+        public ProfilebotImplmentation(ISlackIntegration slackIntegration, ISlackProfileValidator slackProfileValidator, SlackUser adminUser, IFaceWhitelist faceWhitelist) {
             this.slackIntegration = slackIntegration ?? throw new ArgumentNullException(nameof(slackIntegration));
             this.slackProfileValidator = slackProfileValidator ?? throw new ArgumentNullException(nameof(slackProfileValidator));
 
@@ -43,11 +44,20 @@ namespace Hjerpbakk.ProfileBot {
                 throw new ArgumentException(nameof(adminUser.Id));
             }
 
-            adminUserId = adminUser.Id;
+            this.adminUser = new SlackUser {Id = adminUser.Id};
+            this.faceWhitelist = faceWhitelist ?? throw new ArgumentNullException(nameof(faceWhitelist));
         }
 
         /// <summary>
-        /// Connects the bot to Slack.
+        ///     Disconnects the bot from Slack.
+        /// </summary>
+        public void Dispose() {
+            slackIntegration.MessageReceived -= MessageReceived;
+            slackIntegration.Dispose();
+        }
+
+        /// <summary>
+        ///     Connects the bot to Slack.
         /// </summary>
         /// <returns>No object or value is returned by this method when it completes.</returns>
         public async Task Connect() {
@@ -56,24 +66,15 @@ namespace Hjerpbakk.ProfileBot {
         }
 
         /// <summary>
-        /// Disconnects the bot from Slack.
-        /// </summary>
-        public void Dispose() {
-            slackIntegration.MessageReceived -= MessageReceived;
-            slackIntegration.Dispose();
-        }
-
-        /// <summary>
-        /// Parses the messages sent to the bot and answers to the best of its abilities.
-        /// 
-        /// Extend this method to include more commands.
+        ///     Parses the messages sent to the bot and answers to the best of its abilities.
+        ///     Extend this method to include more commands.
         /// </summary>
         /// <param name="message">The message sent to the bot.</param>
         /// <returns>No object or value is returned by this method when it completes.</returns>
         async Task MessageReceived(SlackMessage message) {
             try {
                 VerifyMessageIsComplete(message);
-                var command = MessageParser.ParseCommand(message, adminUserId);
+                var command = MessageParser.ParseCommand(message, adminUser);
                 switch (command) {
                     case AnswerRegularUserCommand _:
                         await AnswerRegularUser(message.User);
@@ -85,24 +86,28 @@ namespace Hjerpbakk.ProfileBot {
                         await ValidateAllProfiles(true);
                         break;
                     case ValidateSingleProfileCommand c:
-                        await ValidateSingleProfile(message.User.Id, c.Payload);
+                        await ValidateSingleProfile(message.User, c.Payload);
                         break;
                     case NotifySingleProfileCommand c:
-                        await ValidateSingleProfile(message.User.Id, c.Payload, true);
+                        await ValidateSingleProfile(message.User, c.Payload, true);
+                        break;
+                    case WhitelistSingleProfileCommand c:
+                        await WhitelistProfile(c.Payload);
                         break;
                     default:
-                        await slackIntegration.SendDirectMessage(message.User.Id,
-                            $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user");
+                        await slackIntegration.SendDirectMessage(message.User,
+                            $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user");
                         break;
                 }
             }
             catch (Exception e) {
                 logger.Error(e);
                 try {
-                    await slackIntegration.SendDirectMessage(adminUserId, $"I crashed:{Environment.NewLine}{e}");
+                    await slackIntegration.SendDirectMessage(adminUser, $"I crashed:{Environment.NewLine}{e}");
                 }
                 catch (Exception exception) {
                     logger.Fatal(exception);
+                    throw;
                 }
             }
         }
@@ -126,62 +131,71 @@ namespace Hjerpbakk.ProfileBot {
         }
 
         async Task AnswerRegularUser(SlackUser user) {
-            await slackIntegration.SendDirectMessage(user.Id, "Checking your profile");
+            await slackIntegration.SendDirectMessage(user, "Checking your profile");
             var verificationResult = await slackProfileValidator.ValidateProfile(user);
             if (verificationResult.IsValid) {
-                await slackIntegration.SendDirectMessage(user.Id,
+                await slackIntegration.SendDirectMessage(user,
                     $"Well done <@{user.Id}>, your profile is complete");
             }
             else {
-                await slackIntegration.SendDirectMessage(user.Id,
-                    verificationResult.Errors);
+                await slackIntegration.SendDirectMessage(user, verificationResult.Errors);
             }
         }
 
         async Task ValidateAllProfiles(bool informUsers = false) {
             if (informUsers) {
-                await slackIntegration.SendDirectMessage(adminUserId, "Notifying all users");
+                await slackIntegration.SendDirectMessage(adminUser, "Notifying all users");
             }
             else {
-                await slackIntegration.SendDirectMessage(adminUserId, "Validating all users");
-            }
-            var usersWithIncompleteProfiles = new List<ProfileValidationResult>();
-            foreach (var user in await slackIntegration.GetAllUsers()) {
-                var verificationResult = await slackProfileValidator.ValidateProfile(user);
-                if (verificationResult.IsValid) {
-                    continue;
-                }
-
-                usersWithIncompleteProfiles.Add(verificationResult);
-                if (!informUsers) {
-                    continue;
-                }
-
-                await slackIntegration.SendDirectMessage(verificationResult.UserId, verificationResult.Errors);
-                await slackIntegration.SendDirectMessage(adminUserId, verificationResult.Errors);
+                await slackIntegration.SendDirectMessage(adminUser, "Validating all users");
             }
 
-            var messageToOwner = usersWithIncompleteProfiles.Count == 0
-                ? "No profiles contain errors :)"
-                : $"{usersWithIncompleteProfiles.Count} users have bad profiles:{Environment.NewLine}{String.Join(", ", usersWithIncompleteProfiles.Select(error => $"<@{error.UserId}>"))}";
-            await slackIntegration.SendDirectMessage(adminUserId, messageToOwner);
+            async Task<string> ValidateAllProfiles() {
+                var usersWithIncompleteProfiles = new List<ProfileValidationResult>();
+                foreach (var user in await slackIntegration.GetAllUsers()) {
+                    await slackIntegration.IndicateTyping(adminUser);
+                    var verificationResult = await slackProfileValidator.ValidateProfile(user);
+                    if (verificationResult.IsValid) {
+                        continue;
+                    }
+
+                    usersWithIncompleteProfiles.Add(verificationResult);
+                    if (!informUsers) {
+                        continue;
+                    }
+
+                    await slackIntegration.SendDirectMessage(verificationResult.User, verificationResult.Errors);
+                    await slackIntegration.SendDirectMessage(adminUser, verificationResult.Errors);
+                }
+
+                var validationReport = new ValidationReport(usersWithIncompleteProfiles.ToArray());
+                await faceWhitelist.UploadReport(validationReport);
+                return validationReport.ToString();
+            }
+
+            await slackIntegration.SendDirectMessage(adminUser, await ValidateAllProfiles());
         }
 
-        async Task ValidateSingleProfile(string sender, SlackStringUser user, bool notify = false) {
+        async Task ValidateSingleProfile(SlackUser sender, SlackUser user, bool notify = false) {
             var verb = notify ? "Notifying" : "Validating";
-            await slackIntegration.SendDirectMessage(sender, $"{verb} {user.SlackUserIdAsString}");
-            var userToCheck = await slackIntegration.GetUser(user.UserId);
-            var verificationResult = await slackProfileValidator.ValidateProfile(userToCheck);
-            if (verificationResult.IsValid) {
-                await slackIntegration.SendDirectMessage(sender,
-                    $"{user.SlackUserIdAsString} has a complete profile");
+            await slackIntegration.SendDirectMessage(sender, $"{verb} {user.FormattedUserId}");
+            var userToCheck = await slackIntegration.GetUser(user.Id);
+            var validationResult = await slackProfileValidator.ValidateProfile(userToCheck);
+            if (validationResult.IsValid) {
+                await slackIntegration.SendDirectMessage(sender, $"{user.FormattedUserId} has a complete profile");
                 return;
             }
 
-            await slackIntegration.SendDirectMessage(sender, verificationResult.Errors);
+            await slackIntegration.SendDirectMessage(sender, validationResult.Errors);
             if (notify) {
-                await slackIntegration.SendDirectMessage(verificationResult.UserId, verificationResult.Errors);
+                await slackIntegration.SendDirectMessage(validationResult.User, validationResult.Errors);
             }
+        }
+
+        async Task WhitelistProfile(SlackUser user) {
+            await slackIntegration.IndicateTyping(adminUser);
+            await faceWhitelist.WhitelistUser(user);
+            await slackIntegration.SendDirectMessage(adminUser, $"Whitelisted {user.FormattedUserId}");
         }
     }
 }

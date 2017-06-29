@@ -3,8 +3,9 @@ using System.IO;
 using System.Reflection;
 using Hjerpbakk.Profilebot.Configuration;
 using Newtonsoft.Json.Linq;
+using SlackConnector.Models;
 
-namespace Hjerpbakk.ProfileBot.Runner.Configuration {
+namespace Hjerpbakk.Profilebot.Runner.Configuration {
     public class ConfigReader {
         readonly Lazy<JObject> currentJObject;
 
@@ -14,11 +15,15 @@ namespace Hjerpbakk.ProfileBot.Runner.Configuration {
 
         public string SlackApiKey => currentJObject.Value.Value<string>("apiToken");
 
-        public AdminUser AdminUser => new AdminUser(currentJObject.Value.Value<string>("adminUserId"));
+        public SlackUser AdminUser => new SlackUser {Id = currentJObject.Value.Value<string>("adminUserId")};
 
         public string ApplicationInsightsInstrumentationKey => currentJObject.Value.Value<string>("applicationInsightsInstrumentationKey");
 
-        public FaceDetectionAPI FaceAPI => new FaceDetectionAPI(currentJObject.Value.Value<string>("faceAPIAccessKey"));
+        public FaceDetectionConfiguration FaceDetectionConfiguration => new FaceDetectionConfiguration(currentJObject.Value.Value<string>("faceAPIAccessKey"), currentJObject.Value.Value<string>("faceAPIURL"), TimeSpan.FromMilliseconds(600D));
+
+        public BlobStorageConfiguration BlobStorageConfiguration => new BlobStorageConfiguration(currentJObject.Value.Value<string>("blobStorageAccountName"), currentJObject.Value.Value<string>("blobStorageAccessKey"), currentJObject.Value.Value<string>("endpointSuffix"));
+
+        public bool ShouldStartHeartBeat => currentJObject.Value.Value<bool>("heartBeat");
 
         static JObject GetJObject() {
             var assemblyLocation = AssemblyLocation();

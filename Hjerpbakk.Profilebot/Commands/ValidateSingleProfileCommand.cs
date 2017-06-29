@@ -1,5 +1,7 @@
-﻿namespace Hjerpbakk.ProfileBot.Commands {
-    internal class ValidateSingleProfileCommand : ProfileBotCommand<SlackStringUser> {
-        public ValidateSingleProfileCommand(SlackStringUser slackStringUser) : base(slackStringUser) { }
+﻿using SlackConnector.Models;
+
+namespace Hjerpbakk.Profilebot.Commands {
+    internal class ValidateSingleProfileCommand : ProfileBotCommand<SlackUser> {
+        public ValidateSingleProfileCommand(SlackUser slackUser) : base(slackUser) { }
     }
 }
