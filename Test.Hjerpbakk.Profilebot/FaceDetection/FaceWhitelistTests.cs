@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,24 +13,12 @@ using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot.FaceDetection {
     /// <summary>
-    ///     If tests fail, verify that the Azure Storage Emulator is running
+    ///     If tests fail, verify that the Azure Storage Emulator is installed
     ///     on the local machine.
     /// </summary>
-    public class FaceWhitelistTests {
-        static FaceWhitelist Create() {
-            return new FaceWhitelist(BlobStorageConfiguration.Local);
-        }
-
-        static async Task VerifyUserIsWhiteListed(SlackUser user) {
-            var storageAccount = CloudStorageAccount.Parse(BlobStorageConfiguration.Local.ConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("whitelist");
-            using (var memoryStream = new MemoryStream()) {
-                await container.GetBlockBlobReference(user.Id).DownloadToStreamAsync(memoryStream);
-                var actualUserId = Encoding.UTF8.GetString(memoryStream.ToArray());
-                Assert.Equal(user.Id, actualUserId);
-            }
-        }
+    public class FaceWhitelistTests : IClassFixture<BlobStorageFixture> {
+        // ReSharper disable once UnusedParameter.Local
+        public FaceWhitelistTests(BlobStorageFixture fixture) { }
 
         [Fact]
         public void Ctor() {
@@ -46,10 +35,6 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             Assert.IsType<ArgumentException>(exception);
         }
 
-        /// <summary>
-        ///     If test fail, verify that the Azure Storage Emulator is running
-        ///     on the local machine.
-        /// </summary>
         [Fact]
         public async Task IsUserWhitelisted_NonWhitelistedUser_False() {
             var faceWhitelist = Create();
@@ -68,10 +53,6 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             Assert.IsType<ArgumentNullException>(exception);
         }
 
-        /// <summary>
-        ///     If test fail, verify that the Azure Storage Emulator is running
-        ///     on the local machine.
-        /// </summary>
         [Fact]
         public async Task IsUserWhitelisted_WhitelistedUser_True() {
             var faceWhitelist = Create();
@@ -81,10 +62,6 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             Assert.True(await faceWhitelist.IsUserWhitelisted(whitelistedUser));
         }
 
-        /// <summary>
-        ///     If test fail, verify that the Azure Storage Emulator is running
-        ///     on the local machine.
-        /// </summary>
         [Fact]
         public async Task UploadReport() {
             var faceWhitelist = Create();
@@ -126,10 +103,6 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             Assert.IsType<ArgumentException>(exception);
         }
 
-        /// <summary>
-        ///     If test fail, verify that the Azure Storage Emulator is running
-        ///     on the local machine.
-        /// </summary>
         [Fact]
         public async Task WhitelistUser_ExistingUser_RemainsWhitelisted() {
             var faceWhitelist = Create();
@@ -144,10 +117,6 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             await VerifyUserIsWhiteListed(userToWhiteList);
         }
 
-        /// <summary>
-        ///     If test fail, verify that the Azure Storage Emulator is running
-        ///     on the local machine.
-        /// </summary>
         [Fact]
         public async Task WhitelistUser_NewUser_IsWhitelisted() {
             var faceWhitelist = Create();
@@ -166,6 +135,49 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             var exception = await Record.ExceptionAsync(() => faceWhitelist.WhitelistUser(null));
 
             Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        static FaceWhitelist Create() => new FaceWhitelist(BlobStorageConfiguration.Local);
+
+        static async Task VerifyUserIsWhiteListed(SlackUser user) {
+            var storageAccount = CloudStorageAccount.Parse(BlobStorageConfiguration.Local.ConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("whitelist");
+            using (var memoryStream = new MemoryStream()) {
+                await container.GetBlockBlobReference(user.Id).DownloadToStreamAsync(memoryStream);
+                var actualUserId = Encoding.UTF8.GetString(memoryStream.ToArray());
+                Assert.Equal(user.Id, actualUserId);
+            }
+        }
+    }
+
+    public class BlobStorageFixture : IDisposable {
+        readonly Process process;
+
+        public BlobStorageFixture() {
+            process = new Process {
+                StartInfo = {
+                    UseShellExecute = false,
+                    FileName = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe",
+                    Arguments = "stop"
+                }
+            };
+            process.Start();
+            process.WaitForExit(10000);
+
+            process.StartInfo.Arguments = "clear all";
+            process.Start();
+            process.WaitForExit(10000);
+
+            process.StartInfo.Arguments = "start";
+            process.Start();
+            process.WaitForExit(10000);
+        }
+
+        public void Dispose() {
+            process.StartInfo.Arguments = "stop";
+            process.Start();
+            process.WaitForExit(10000);
         }
     }
 }

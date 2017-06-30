@@ -57,10 +57,6 @@
     project: Hjerpbakk.Profilebot.sln
     verbosity: minimal
 
-  before_test:
-    - cmd: "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" stop
-    - cmd: "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" clear all
-    - cmd: "C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" start
   test_script:
     - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Release\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*" -returntargetcode
   after_test:
