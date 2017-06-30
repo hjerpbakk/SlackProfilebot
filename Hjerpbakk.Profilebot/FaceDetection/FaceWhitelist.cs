@@ -78,7 +78,7 @@ namespace Hjerpbakk.Profilebot.FaceDetection {
             var reportContainer = blobClient.GetContainerReference(ReportName);
             reportContainer.CreateIfNotExists();
 
-            var blobRef = reportContainer.GetBlockBlobReference(ReportName);
+            var blobRef = reportContainer.GetBlockBlobReference(ReportName + ".html");
             await blobRef.UploadTextAsync(report.CreateHTMLReport());
         }
 

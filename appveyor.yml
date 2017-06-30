@@ -58,7 +58,7 @@
     verbosity: minimal
 
   test_script:
-    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Release\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
+    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Release\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*" -returntargetcode
   after_test:
     - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
     - pip install codecov

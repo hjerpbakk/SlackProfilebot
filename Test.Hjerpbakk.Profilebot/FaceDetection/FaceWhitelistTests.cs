@@ -98,7 +98,7 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference("report");
             using (var memoryStream = new MemoryStream()) {
-                await container.GetBlockBlobReference("report").DownloadToStreamAsync(memoryStream);
+                await container.GetBlockBlobReference("report.html").DownloadToStreamAsync(memoryStream);
                 var report = Encoding.UTF8.GetString(memoryStream.ToArray());
                 Assert.Contains(suspectImage.AbsolutePath, report);
                 Assert.Contains(name, report);
