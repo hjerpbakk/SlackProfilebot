@@ -32,7 +32,7 @@
       secure: 75oaXQhx7Z0tW7xqn8XuoRd0AV1hwAf7u5W9XCK5bje2DxaptjfPVJ7qdOSw+7mV
     BLOB_STORAGE:
       secure: 2RQPegoJG+fJAlSF8szG4HAYxaF8cNrZ4f95TdQTJt1qjPHEf4wMpINLGLgsOhQAkpUtjR+DjeyIHIP4ZDGkIAjN9cp1uDwm5nTSrFkVlC7P3IBWrDdrti40Q+7swpI/
-    EMU: "%programfiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe"
+    EMU: %programfiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe
   install:  
     - docker version
 
