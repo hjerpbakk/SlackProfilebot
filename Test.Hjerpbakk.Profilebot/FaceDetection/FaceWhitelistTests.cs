@@ -162,16 +162,16 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
                 }
             };
 
-            StartAndWaitExit("stop");
-            StartAndWaitExit("clear all");
-            StartAndWaitExit("start");
+            StartAndWaitForExit("stop");
+            StartAndWaitForExit("clear all");
+            StartAndWaitForExit("start");
         }
 
         public void Dispose() {
-            StartAndWaitExit("stop");
+            StartAndWaitForExit("stop");
         }
 
-        void StartAndWaitExit(string arguments) {
+        void StartAndWaitForExit(string arguments) {
             process.StartInfo.Arguments = arguments;
             process.Start();
             process.WaitForExit(10000);
