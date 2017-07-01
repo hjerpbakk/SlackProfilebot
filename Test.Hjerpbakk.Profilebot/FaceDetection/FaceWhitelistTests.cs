@@ -159,23 +159,20 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
                 StartInfo = {
                     UseShellExecute = false,
                     FileName = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe",
-                    Arguments = "stop"
                 }
             };
-            process.Start();
-            process.WaitForExit(10000);
 
-            process.StartInfo.Arguments = "clear all";
-            process.Start();
-            process.WaitForExit(10000);
-
-            process.StartInfo.Arguments = "start";
-            process.Start();
-            process.WaitForExit(10000);
+            StartAndWaitExit("stop");
+            StartAndWaitExit("clear all");
+            StartAndWaitExit("start");
         }
 
         public void Dispose() {
-            process.StartInfo.Arguments = "stop";
+            StartAndWaitExit("stop");
+        }
+
+        void StartAndWaitExit(string arguments) {
+            process.StartInfo.Arguments = arguments;
             process.Start();
             process.WaitForExit(10000);
         }

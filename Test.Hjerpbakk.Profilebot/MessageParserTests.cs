@@ -95,6 +95,14 @@ namespace Test.Hjerpbakk.Profilebot {
             Assert.Equal(slackUserToBeVerified.Id, command.Payload.Id);
         }
 
+        [Fact]
+        public void ParseCommand_SpaceAfterUser_IsParsedCorrectly() {
+            var command = (ProfileBotCommand<SlackUser>) MessageParser.ParseCommand(
+                CreateMessage(adminUser, "Whitelist <@U4GHU76NA> "), adminUser);
+
+            Assert.IsType<WhitelistSingleProfileCommand>(command);
+        }
+
         public static SlackMessage CreateMessage(SlackUser sender, string messageText) =>
             new SlackMessage {User = sender, Text = messageText};
     }

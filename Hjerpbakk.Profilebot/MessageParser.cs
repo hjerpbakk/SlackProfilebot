@@ -4,7 +4,7 @@ using SlackConnector.Models;
 namespace Hjerpbakk.Profilebot {
     internal static class MessageParser {
         public static ProfileBotCommand ParseCommand(SlackMessage message, SlackUser adminUser) {
-            var normalizedMessage = message.Text.ToLower();
+            var normalizedMessage = message.Text.Trim().ToLower();
             return message.User.Id == adminUser.Id ? ParseAdminCommand(normalizedMessage) : AnswerRegularUserCommand.Create();
         }
 
