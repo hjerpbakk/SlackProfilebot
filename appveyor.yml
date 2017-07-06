@@ -4,7 +4,7 @@
     only:
       - master
 
-  version: 1.0.{build}
+  version: 1.0.1.{build}
 
   pull_requests:
     do_not_increment_build_number: true
@@ -40,10 +40,6 @@
       secure: TZkmm9c6BTcnLdm8gLhT9w==
     VM_PW:
       secure: MF7kQFablniedlsJFTCTD1HprkUyPJVrEyK7u7SbHvQ=
-    APPVEYOR_RDP_PASSWORD: EmxugzC2WeEjQj3ueDy2ZYTmJxfoVA
-
-  init:
-    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
   install:  
     - docker version
@@ -88,9 +84,6 @@
     - ps: docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
     - docker push hjerpbakk/profilebot
     - ps: .\RunLatestContainer.ps1
-
-  on_finish:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Other branches, only build and test
 -
