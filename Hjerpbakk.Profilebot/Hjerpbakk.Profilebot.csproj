@@ -137,6 +137,7 @@
     <Compile Include="Commands\NotifyAllProfilesCommand.cs" />
     <Compile Include="Commands\NotifySingleProfileCommand.cs" />
     <Compile Include="Commands\AnswerRegularUserCommand.cs" />
+    <Compile Include="Commands\ShowVersionNumberCommand.cs" />
     <Compile Include="Commands\UnknownCommand.cs" />
     <Compile Include="Commands\ValidateAllProfilesCommand.cs" />
     <Compile Include="Commands\ValidateSingleProfileCommand.cs" />

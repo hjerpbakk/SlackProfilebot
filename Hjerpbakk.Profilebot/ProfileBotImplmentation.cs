@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Hjerpbakk.Profilebot.Commands;
 using Hjerpbakk.Profilebot.Contracts;
@@ -98,9 +99,12 @@ namespace Hjerpbakk.Profilebot {
                     case WhitelistSingleProfileCommand c:
                         await WhitelistProfile(c.Payload);
                         break;
+                    case ShowVersionNumberCommand _:
+                        await SendVersionNumber();
+                        break;
                     default:
                         await slackIntegration.SendDirectMessage(message.User,
-                            $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user");
+                            $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user{Environment.NewLine}- version");
                         break;
                 }
             }
@@ -204,6 +208,12 @@ namespace Hjerpbakk.Profilebot {
             await slackIntegration.IndicateTyping(adminUser);
             await faceWhitelist.WhitelistUser(user);
             await slackIntegration.SendDirectMessage(adminUser, $"Whitelisted {user.FormattedUserId}");
+        }
+
+        async Task SendVersionNumber() {
+            await slackIntegration.IndicateTyping(adminUser);
+            var version = Assembly.GetAssembly(typeof(ProfilebotImplmentation)).GetName().Version.ToString();
+            await slackIntegration.SendDirectMessage(adminUser, version);
         }
     }
 }

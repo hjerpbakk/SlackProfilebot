@@ -14,6 +14,8 @@ namespace Hjerpbakk.Profilebot {
                     return ValidateAllProfilesCommand.Create();
                 case "notify all users":
                     return NotifyAllProfilesCommand.Create();
+                case "version":
+                    return ShowVersionNumberCommand.Create();
                 default:
                     return ParseVerbSubjectCommands(normalizedMessage);
             }

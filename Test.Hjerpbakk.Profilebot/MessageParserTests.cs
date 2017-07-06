@@ -103,6 +103,13 @@ namespace Test.Hjerpbakk.Profilebot {
             Assert.IsType<WhitelistSingleProfileCommand>(command);
         }
 
+        [Fact]
+        public void ParseCommand_ShowVersion() {
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "version"), adminUser);
+
+            Assert.IsType<ShowVersionNumberCommand>(command);
+        }
+
         public static SlackMessage CreateMessage(SlackUser sender, string messageText) =>
             new SlackMessage {User = sender, Text = messageText, ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}};
     }

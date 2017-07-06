@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Hjerpbakk.Profilebot.FaceDetection;
 using Hjerpbakk.Profilebot;
@@ -214,7 +215,7 @@ namespace Test.Hjerpbakk.Profilebot {
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser, "Unknown command"));
 
-            slackIntegration.Verify(s => s.SendDirectMessage(adminUser, $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user"));
+            slackIntegration.Verify(s => s.SendDirectMessage(adminUser, $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user{Environment.NewLine}- version"));
         }
 
         [Fact]
@@ -310,6 +311,17 @@ namespace Test.Hjerpbakk.Profilebot {
             slackIntegration.Verify(s => s.IndicateTyping(It.Is<SlackUser>(u => u.Id == adminUser.Id)));
             creationResult.FaceWhitelistFake.Verify(f => f.WhitelistUser(It.Is<SlackUser>(s => s.Id == adminUser.Id)));
             slackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), "Whitelisted <@U1TBU8336>"));
+        }
+
+        [Fact]
+        public async Task Version_ShowsVersion() {
+            var creationResult = await CreateProfileBot(true);
+            var version = Assembly.GetAssembly(typeof(ProfilebotImplmentation)).GetName().Version.ToString();
+
+            creationResult.SlackIntegration.Raise(s => s.MessageReceived += null, MessageParserTests.CreateMessage(adminUser, "version"));
+
+            creationResult.SlackIntegration.Verify(s => s.IndicateTyping(It.Is<SlackUser>(u => u.Id == adminUser.Id)));
+            creationResult.SlackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), version));
         }
 
         static ProfileValidationResult ValidResult() =>
