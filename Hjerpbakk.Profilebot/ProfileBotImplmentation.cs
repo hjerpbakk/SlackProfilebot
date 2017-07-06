@@ -74,6 +74,10 @@ namespace Hjerpbakk.Profilebot {
         async Task MessageReceived(SlackMessage message) {
             try {
                 VerifyMessageIsComplete(message);
+                if (message.ChatHub.Type != SlackChatHubType.DM) {
+                    return;
+                }
+
                 var command = MessageParser.ParseCommand(message, adminUser);
                 switch (command) {
                     case AnswerRegularUserCommand _:
@@ -127,6 +131,10 @@ namespace Hjerpbakk.Profilebot {
 
             if (string.IsNullOrEmpty(message.Text)) {
                 throw new ArgumentException(nameof(message.Text));
+            }
+
+            if (message.ChatHub == null) {
+                throw new ArgumentNullException(nameof(message.ChatHub));
             }
         }
 

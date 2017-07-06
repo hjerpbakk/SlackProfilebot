@@ -104,6 +104,6 @@ namespace Test.Hjerpbakk.Profilebot {
         }
 
         public static SlackMessage CreateMessage(SlackUser sender, string messageText) =>
-            new SlackMessage {User = sender, Text = messageText};
+            new SlackMessage {User = sender, Text = messageText, ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}};
     }
 }

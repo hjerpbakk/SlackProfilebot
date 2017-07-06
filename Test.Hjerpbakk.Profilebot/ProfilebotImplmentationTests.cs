@@ -18,9 +18,10 @@ namespace Test.Hjerpbakk.Profilebot {
 
         public static IEnumerable<object[]> InvalidMessages = new[] {
             new object[] {null},
-            new object[] {new SlackMessage()},
-            new object[] {new SlackMessage {User = new SlackUser()}},
-            new object[] {new SlackMessage {User = new SlackUser {Id = "Id"}}}
+            new object[] {new SlackMessage {ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}}},
+            new object[] {new SlackMessage {User = new SlackUser(), ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}}},
+            new object[] {new SlackMessage {User = new SlackUser {Id = "Id"}, ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}}},
+            new object[] {new SlackMessage {User = new SlackUser {Id = "Id"}, Text = "SlackChatHubMissing"}}
         };
 
         [Theory]
@@ -150,7 +151,7 @@ namespace Test.Hjerpbakk.Profilebot {
             slackIntegration.Setup(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), It.IsRegex("I crashed"))).Throws(new Exception());
             slackIntegration.Setup(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), It.IsRegex("Available commands"))).Throws(new Exception());
 
-            slackIntegration.Raise(s => s.MessageReceived += null, new SlackMessage {User = adminUser, Text = "Message"});
+            slackIntegration.Raise(s => s.MessageReceived += null, MessageParserTests.CreateMessage(adminUser, "Message"));
 
             slackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), It.IsRegex("I crashed")));
         }
@@ -214,6 +215,30 @@ namespace Test.Hjerpbakk.Profilebot {
                 MessageParserTests.CreateMessage(adminUser, "Unknown command"));
 
             slackIntegration.Verify(s => s.SendDirectMessage(adminUser, $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user"));
+        }
+
+        [Fact]
+        public async Task MessageInChannel_DoesNothing() {
+            var creationResult = await CreateProfileBot(true);
+            var slackIntegration = creationResult.SlackIntegration;
+            var message = MessageParserTests.CreateMessage(adminUser, "Unknown command");
+            message.ChatHub = new SlackChatHub {Type = SlackChatHubType.Channel};
+
+            slackIntegration.Raise(s => s.MessageReceived += null, message);
+
+            slackIntegration.Verify(s => s.SendDirectMessage(It.IsAny<SlackUser>(), It.IsAny<string>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task MessageInGroupChat_DoesNothing() {
+            var creationResult = await CreateProfileBot(true);
+            var slackIntegration = creationResult.SlackIntegration;
+            var message = MessageParserTests.CreateMessage(adminUser, "Unknown command");
+            message.ChatHub = new SlackChatHub {Type = SlackChatHubType.Group};
+
+            slackIntegration.Raise(s => s.MessageReceived += null, message);
+
+            slackIntegration.Verify(s => s.SendDirectMessage(It.IsAny<SlackUser>(), It.IsAny<string>()), Times.Never());
         }
 
         [Fact]
