@@ -41,7 +41,7 @@
     VM_PW:
       secure: MF7kQFablniedlsJFTCTD1HprkUyPJVrEyK7u7SbHvQ=
     APPVEYOR_RDP_PASSWORD:
-      secure: xd/npyy3U5jHSs4ojDEcIT05fu2hexemFsj89NEP7wo=
+      secure: RWV/wsT2+hLGwkRoOZwlpa9e9y5Qiz1h+bUdzVa1K14=
 
   init:
     - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
