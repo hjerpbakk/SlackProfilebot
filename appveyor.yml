@@ -32,8 +32,19 @@
       secure: 75oaXQhx7Z0tW7xqn8XuoRd0AV1hwAf7u5W9XCK5bje2DxaptjfPVJ7qdOSw+7mV
     BLOB_STORAGE:
       secure: 2RQPegoJG+fJAlSF8szG4HAYxaF8cNrZ4f95TdQTJt1qjPHEf4wMpINLGLgsOhQAkpUtjR+DjeyIHIP4ZDGkIAjN9cp1uDwm5nTSrFkVlC7P3IBWrDdrti40Q+7swpI/
+    CERT_PW:
+      secure: WM7RmuvGnxW2NEQ4ZlcUnMZd++nRyVSZgloJdfOVBmg=
+    VM_URL:
+      secure: 5uMnmDE5zt7qHskbuh8zm5kU9Ib3JFtFwzGpMcyk296EIJhMJSfs9flMRjW1GnfN
+    VM_USER:
+      secure: TZkmm9c6BTcnLdm8gLhT9w==
+    VM_PW:
+      secure: MF7kQFablniedlsJFTCTD1HprkUyPJVrEyK7u7SbHvQ=
   install:  
     - docker version
+    - nuget install secure-file -ExcludeVersion
+    - secure-file\tools\secure-file -decrypt profilebot.cer.enc -secret %CERT_PW%
+    - ps: .\InstallCert.ps1
 
   configuration:
   - Release
@@ -71,6 +82,7 @@
   deploy_script:
     - ps: docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
     - docker push hjerpbakk/profilebot
+    - ps: .\RunLatestContainer.ps1
 
 # Other branches, only build and test
 -

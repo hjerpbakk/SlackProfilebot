@@ -289,3 +289,6 @@ __pycache__/
 
 # Slack-secrets
 config.json
+
+# Certificate
+profilebot.cer
