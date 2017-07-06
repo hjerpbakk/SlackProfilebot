@@ -40,6 +40,12 @@
       secure: TZkmm9c6BTcnLdm8gLhT9w==
     VM_PW:
       secure: MF7kQFablniedlsJFTCTD1HprkUyPJVrEyK7u7SbHvQ=
+    APPVEYOR_RDP_PASSWORD:
+      secure: xd/npyy3U5jHSs4ojDEcIT05fu2hexemFsj89NEP7wo=
+
+  init:
+    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
   install:  
     - docker version
     - nuget install secure-file -ExcludeVersion
@@ -83,6 +89,9 @@
     - ps: docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
     - docker push hjerpbakk/profilebot
     - ps: .\RunLatestContainer.ps1
+
+  on_finish:
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # Other branches, only build and test
 -
