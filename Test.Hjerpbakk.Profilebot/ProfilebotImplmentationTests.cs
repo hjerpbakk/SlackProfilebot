@@ -214,7 +214,7 @@ namespace Test.Hjerpbakk.Profilebot {
             slackIntegration.Raise(s => s.MessageReceived += null,
                 MessageParserTests.CreateMessage(adminUser, "Unknown command"));
 
-            slackIntegration.Verify(s => s.SendDirectMessage(adminUser, $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist @user{Environment.NewLine}- version"));
+            slackIntegration.Verify(s => s.SendDirectMessage(adminUser, $"Available commands are:{Environment.NewLine}- validate all users{Environment.NewLine}- notify all users{Environment.NewLine}- validate @user{Environment.NewLine}- notify @user{Environment.NewLine}- whitelist{Environment.NewLine}- whitelist @user{Environment.NewLine}- version"));
         }
 
         [Fact]
