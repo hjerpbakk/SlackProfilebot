@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Hjerpbakk.Profilebot.Commands;
@@ -101,6 +102,9 @@ namespace Hjerpbakk.Profilebot {
                         break;
                     case ShowVersionNumberCommand _:
                         await SendVersionNumber();
+                        break;
+                    case ShowWhitelistedUsersCommand _:
+                        await SendWhitelistedUsers();
                         break;
                     default:
                         await slackIntegration.SendDirectMessage(message.User,
@@ -214,6 +218,13 @@ namespace Hjerpbakk.Profilebot {
             await slackIntegration.IndicateTyping(adminUser);
             var version = Assembly.GetAssembly(typeof(ProfilebotImplmentation)).GetName().Version.ToString();
             await slackIntegration.SendDirectMessage(adminUser, version);
+        }
+
+        async Task SendWhitelistedUsers() {
+            await slackIntegration.IndicateTyping(adminUser);
+            var whitelistedUsers = await faceWhitelist.GetWhitelistedUsers();
+            var message = "Whitelist: " + string.Join(", ", whitelistedUsers.Select(u => u.FormattedUserId));
+            await slackIntegration.SendDirectMessage(adminUser, message);
         }
     }
 }

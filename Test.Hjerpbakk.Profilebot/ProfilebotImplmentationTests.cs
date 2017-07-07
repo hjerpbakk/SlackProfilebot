@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Hjerpbakk.Profilebot.FaceDetection;
 using Hjerpbakk.Profilebot;
@@ -316,12 +315,24 @@ namespace Test.Hjerpbakk.Profilebot {
         [Fact]
         public async Task Version_ShowsVersion() {
             var creationResult = await CreateProfileBot(true);
-            var version = Assembly.GetAssembly(typeof(ProfilebotImplmentation)).GetName().Version.ToString();
 
             creationResult.SlackIntegration.Raise(s => s.MessageReceived += null, MessageParserTests.CreateMessage(adminUser, "version"));
 
             creationResult.SlackIntegration.Verify(s => s.IndicateTyping(It.Is<SlackUser>(u => u.Id == adminUser.Id)));
-            creationResult.SlackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), version));
+            creationResult.SlackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), "1.0.0.0"));
+        }
+
+        [Fact]
+        public async Task Whitelist_ShowWhitelistedUsers() {
+            var creationResult = await CreateProfileBot(true);
+            var slackIntegration = creationResult.SlackIntegration;
+            creationResult.FaceWhitelistFake.Setup(w => w.GetWhitelistedUsers()).ReturnsAsync(new[] {new SlackUser {Id = "U1TBU8336"}, new SlackUser {Id = "U1TBU8346"}});
+
+            slackIntegration.Raise(s => s.MessageReceived += null, MessageParserTests.CreateMessage(adminUser, "Whitelist"));
+
+            slackIntegration.Verify(s => s.IndicateTyping(It.Is<SlackUser>(u => u.Id == adminUser.Id)));
+            creationResult.FaceWhitelistFake.Verify(f => f.GetWhitelistedUsers());
+            slackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), "Whitelist: <@U1TBU8336>, <@U1TBU8346>"));
         }
 
         static ProfileValidationResult ValidResult() =>

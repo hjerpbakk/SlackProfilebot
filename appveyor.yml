@@ -4,7 +4,7 @@
     only:
       - master
 
-  version: 1.0.2.{build}
+  version: 1.1.0.{build}
 
   pull_requests:
     do_not_increment_build_number: true
@@ -87,7 +87,7 @@
 
 # Other branches, only build and test
 -
-  version: 1.0.2.{build}
+  version: 1.1.0.{build}
 
   pull_requests:
     do_not_increment_build_number: true

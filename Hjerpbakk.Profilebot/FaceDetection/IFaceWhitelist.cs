@@ -27,5 +27,11 @@ namespace Hjerpbakk.Profilebot.FaceDetection {
         /// <param name="report">The report to upload.</param>
         /// <returns>No object or value is returned by this method when it completes.</returns>
         Task UploadReport(ValidationReport report);
+
+        /// <summary>
+        ///     Gets the whitelisted users.
+        /// </summary>
+        /// <returns>The whitelisted users</returns>
+        Task<SlackUser[]> GetWhitelistedUsers();
     }
 }

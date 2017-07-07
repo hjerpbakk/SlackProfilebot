@@ -17,16 +17,20 @@ namespace Hjerpbakk.Profilebot {
                 case "version":
                     return ShowVersionNumberCommand.Create();
                 default:
-                    return ParseVerbSubjectCommands(normalizedMessage);
+                    var commandParts = normalizedMessage.Split(' ');
+                    if (commandParts.Length == 2 && commandParts[1].StartsWith("<@") && commandParts[1][commandParts[1].Length - 1] == '>') {
+                        return ParseVerbSubjectCommands(commandParts);
+                    }
+
+                    if (normalizedMessage == "whitelist") {
+                        return ShowWhitelistedUsersCommand.Create();
+                    }
+
+                    return UnknownCommand.Create();
             }
         }
 
-        static ProfileBotCommand ParseVerbSubjectCommands(string normalizedMessage) {
-            var commandParts = normalizedMessage.Split(' ');
-            if (commandParts.Length != 2 || !commandParts[1].StartsWith("<@") || commandParts[1][commandParts[1].Length - 1] != '>') {
-                return UnknownCommand.Create();
-            }
-
+        static ProfileBotCommand ParseVerbSubjectCommands(string[] commandParts) {
             var verb = commandParts[0];
             var slackUserId = commandParts[1].Substring(2, commandParts[1].Length - 3).ToUpper();
             var subject = new SlackUser {Id = slackUserId};

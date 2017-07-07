@@ -41,9 +41,7 @@ namespace Hjerpbakk.Profilebot.FaceDetection {
         /// <returns>Whether the given user is whitelisted.</returns>
         public async Task<bool> IsUserWhitelisted(SlackUser user) {
             user.Guard();
-            if (whitelistedUserIds.Count == 0) {
-                await PopulateWhitelist();
-            }
+            await InitializeWhitelistIfNeeded();
 
             return whitelistedUserIds.Contains(user.Id);
         }
@@ -82,6 +80,15 @@ namespace Hjerpbakk.Profilebot.FaceDetection {
             await blobRef.UploadTextAsync(report.CreateHTMLReport());
         }
 
+        /// <summary>
+        ///     Gets the whitelisted users.
+        /// </summary>
+        /// <returns>The whitelisted users</returns>
+        public async Task<SlackUser[]> GetWhitelistedUsers() {
+            await InitializeWhitelistIfNeeded();
+            return whitelistedUserIds.Select(id => new SlackUser {Id = id}).ToArray();
+        }
+
         async Task PopulateWhitelist() {
             var blobs = container.ListBlobs();
             foreach (var blob in blobs.Cast<CloudBlockBlob>()) {
@@ -90,6 +97,12 @@ namespace Hjerpbakk.Profilebot.FaceDetection {
                     var user = Encoding.UTF8.GetString(memoryStream.ToArray());
                     whitelistedUserIds.Add(user);
                 }
+            }
+        }
+
+        async Task InitializeWhitelistIfNeeded() {
+            if (whitelistedUserIds.Count == 0) {
+                await PopulateWhitelist();
             }
         }
     }

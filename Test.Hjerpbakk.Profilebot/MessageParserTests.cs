@@ -110,6 +110,13 @@ namespace Test.Hjerpbakk.Profilebot {
             Assert.IsType<ShowVersionNumberCommand>(command);
         }
 
+        [Fact]
+        public void ParseCommand_ShowWhitelistedUsers() {
+            var command = MessageParser.ParseCommand(CreateMessage(adminUser, "whitelist"), adminUser);
+
+            Assert.IsType<ShowWhitelistedUsersCommand>(command);
+        }
+
         public static SlackMessage CreateMessage(SlackUser sender, string messageText) =>
             new SlackMessage {User = sender, Text = messageText, ChatHub = new SlackChatHub {Type = SlackChatHubType.DM}};
     }

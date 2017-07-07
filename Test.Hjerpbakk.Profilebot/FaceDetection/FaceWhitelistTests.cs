@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hjerpbakk.Profilebot.Configuration;
@@ -125,6 +126,18 @@ namespace Test.Hjerpbakk.Profilebot.FaceDetection {
             await faceWhitelist.WhitelistUser(userToWhiteList);
 
             await VerifyUserIsWhiteListed(userToWhiteList);
+        }
+
+        [Fact]
+        public async Task GetWhitelistedUsers() {
+            var faceWhitelist = Create();
+            var userToWhiteList = new SlackUser {Id = Path.GetRandomFileName()};
+
+            await faceWhitelist.WhitelistUser(userToWhiteList);
+
+            var whitelistedUsers = await faceWhitelist.GetWhitelistedUsers();
+
+            Assert.NotNull(whitelistedUsers.SingleOrDefault(u => u.Id == userToWhiteList.Id));
         }
 
         [Fact]
