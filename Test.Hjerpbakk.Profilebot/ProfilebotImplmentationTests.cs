@@ -319,7 +319,7 @@ namespace Test.Hjerpbakk.Profilebot {
             creationResult.SlackIntegration.Raise(s => s.MessageReceived += null, MessageParserTests.CreateMessage(adminUser, "version"));
 
             creationResult.SlackIntegration.Verify(s => s.IndicateTyping(It.Is<SlackUser>(u => u.Id == adminUser.Id)));
-            creationResult.SlackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), "1.0.0.0"));
+            creationResult.SlackIntegration.Verify(s => s.SendDirectMessage(It.Is<SlackUser>(u => u.Id == adminUser.Id), It.IsRegex("\\d*[.]\\d*[.]\\d*[.]\\d*")));
         }
 
         [Fact]
