@@ -16,5 +16,9 @@ namespace Hjerpbakk.Profilebot.Runner {
         public Task UploadReport(ValidationReport report) {
             return Task.CompletedTask;
         }
+
+        public Task<SlackUser[]> GetWhitelistedUsers() {
+            return Task.FromResult(new SlackUser[0]);
+        }
     }
 }
