@@ -59,8 +59,8 @@ namespace Hjerpbakk.Profilebot {
                 : new ProfileValidationResult(user,
                     $"Hei <@{user.Id}>, jeg har sett gjennom profilen din og den har følgende mangler:" +
                     $"{Environment.NewLine}{Environment.NewLine}{actualErrors}{Environment.NewLine}" +
-                    "Se https://utvikling/t/slack/1822 for hva som kreves av en fullt utfylt profil." +
-                    $"{Environment.NewLine}Ta kontakt med <@{adminUserId}> dersom du har spørsmål.", imageWasSuspect ? new Uri(user.Image) : null);
+                    "Se https://github.com/DIPSAS/community/blob/master/communication/slack-guidelines.md for hva som kreves av en fullt utfylt profil." +
+                    $"{Environment.NewLine}Ta kontakt med #admins dersom du har spørsmål.", imageWasSuspect ? new Uri(user.Image) : null);
         }
 
         static void ValidateEmail(SlackUser user, StringBuilder errors) {

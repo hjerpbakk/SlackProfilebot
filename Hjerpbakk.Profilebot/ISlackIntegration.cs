@@ -8,7 +8,7 @@ namespace Hjerpbakk.Profilebot {
     /// <summary>
     ///     Interface for the Slack APIs needed for Profilebot.
     /// </summary>
-    public interface ISlackIntegration : IDisposable {
+    public interface ISlackIntegration {
         /// <summary>
         ///     Raised everytime the bot gets a DM.
         /// </summary>

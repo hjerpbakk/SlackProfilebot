@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hjerpbakk.Profilebot;
 using Hjerpbakk.Profilebot.Contracts;
 using SlackConnector;
 using SlackConnector.EventHandlers;
@@ -23,7 +22,8 @@ namespace Hjerpbakk.Profilebot {
         /// </summary>
         /// <param name="connector">The Slack connector to use.</param>
         /// <param name="slackKey">The Slack key to use.</param>
-        public SlackIntegration(ISlackConnector connector, string slackKey) {
+        public SlackIntegration(ISlackConnector connector, string slackKey) 
+        {
             this.connector = connector ?? throw new ArgumentNullException(nameof(connector));
 
             if (string.IsNullOrEmpty(slackKey)) {
@@ -47,10 +47,6 @@ namespace Hjerpbakk.Profilebot {
         /// <returns>No object or value is returned by this method when it completes.</returns>
         public async Task Connect() {
             connection = await connector.Connect(slackKey);
-        }
-
-        public void Dispose() {
-            connection?.Disconnect();
         }
 
         /// <summary>

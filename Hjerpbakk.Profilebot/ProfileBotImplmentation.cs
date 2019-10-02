@@ -55,7 +55,6 @@ namespace Hjerpbakk.Profilebot {
         /// </summary>
         public void Dispose() {
             slackIntegration.MessageReceived -= MessageReceived;
-            slackIntegration.Dispose();
         }
 
         /// <summary>
