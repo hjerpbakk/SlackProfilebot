@@ -8,7 +8,10 @@ using SlackConnector.Models;
 using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot {
-    public class SlackIntegrationTests {
+    public class SlackIntegrationTests
+    {
+        private const string SlackKey = "my_slack_key";
+        
         bool called;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -17,12 +20,15 @@ namespace Test.Hjerpbakk.Profilebot {
         }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
-        async Task<(SlackIntegration SlackIntegration, Mock<ISlackConnector> Connector, Mock<ISlackConnection> Connection)> CreateSlackIntegration(bool init = true) {
+        static async Task<(SlackIntegration SlackIntegration, Mock<ISlackConnector> Connector, Mock<ISlackConnection> Connection)>
+            CreateSlackIntegration(bool init = true)
+        {
             var slackConnectionFake = new Mock<ISlackConnection>();
             var slackConnectorFake = new Mock<ISlackConnector>();
-            slackConnectorFake.Setup(s => s.Connect(It.IsAny<string>(), null)).ReturnsAsync(slackConnectionFake.Object);
-            var slack = new SlackIntegration(slackConnectorFake.Object, "a");
-            if (init) {
+            slackConnectorFake.Setup(x => x.Connect(SlackKey)).ReturnsAsync(slackConnectionFake.Object);
+            var slack = new SlackIntegration(slackConnectorFake.Object, SlackKey);
+            if (init)
+            {
                 await slack.Connect();
             }
 
@@ -31,7 +37,7 @@ namespace Test.Hjerpbakk.Profilebot {
 
         [Fact]
         public void Constructor_NoConnector_Fails() {
-            var exception = Record.Exception(() => new SlackIntegration(null, "a"));
+            var exception = Record.Exception(() => new SlackIntegration(null, SlackKey));
 
             Assert.IsType<ArgumentNullException>(exception);
         }
@@ -41,22 +47,6 @@ namespace Test.Hjerpbakk.Profilebot {
             var exception = Record.Exception(() => new SlackIntegration(new Mock<ISlackConnector>().Object, null));
 
             Assert.IsType<ArgumentException>(exception);
-        }
-
-        [Fact]
-        public async Task Dispose_AfterInit_Disconnects() {
-            var slack = await CreateSlackIntegration();
-
-            slack.SlackIntegration.Dispose();
-
-            slack.Connection.Verify(c => c.Disconnect());
-        }
-
-        [Fact]
-        public async Task Dispose_WithoutInit_DoesNothing() {
-            var slack = await CreateSlackIntegration(false);
-
-            slack.SlackIntegration.Dispose();
         }
 
         [Fact]
@@ -131,7 +121,7 @@ namespace Test.Hjerpbakk.Profilebot {
         public async Task Init_WithValidConnector_Connects() {
             var slack = await CreateSlackIntegration();
 
-            slack.Connector.Verify(c => c.Connect(It.IsAny<string>(), null));
+            slack.Connector.Verify(c => c.Connect(It.IsAny<string>()));
         }
 
         [Fact]

@@ -127,15 +127,6 @@ namespace Test.Hjerpbakk.Profilebot {
         }
 
         [Fact]
-        public async Task Dispose_Called_Disposes() {
-            var creationResult = await CreateProfileBot();
-
-            creationResult.ProfileBot.Dispose();
-
-            creationResult.SlackIntegration.Verify(s => s.Dispose());
-        }
-
-        [Fact]
         public async Task Init_Called_Inits() {
             var creationResult = await CreateProfileBot();
 
