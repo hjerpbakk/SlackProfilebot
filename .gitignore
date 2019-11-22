@@ -288,7 +288,7 @@ __pycache__/
 *.xsd.cs
 
 # Slack-secrets
-config.json
+Hjerpbakk.Profilebot.Runner/Configuration/config.json
 
 # Certificate
 profilebot.cer

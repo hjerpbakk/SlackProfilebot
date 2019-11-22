@@ -39,12 +39,20 @@ namespace Hjerpbakk.Profilebot {
 
             ValidateEmail(user, errors);
 
-            if (string.IsNullOrEmpty(user.FirstName)) {
-                errors.AppendLine("Fornavn må registreres slik at folk vet hvem du er.");
-            }
-
-            if (string.IsNullOrEmpty(user.LastName)) {
-                errors.AppendLine("Etternavn må registreres slik at folk vet hvem du er.");
+            if (string.IsNullOrEmpty(user.Name))
+            {
+                if (string.IsNullOrEmpty(user.FirstName) && string.IsNullOrEmpty(user.LastName))
+                {
+                    errors.AppendLine("Fullt navn må registreres slik at folk vet hvem du er.");
+                }
+                else if (string.IsNullOrEmpty(user.FirstName))
+                {
+                    errors.AppendLine("Fornavn må registreres slik at folk vet hvem du er.");
+                }
+                else if (string.IsNullOrEmpty(user.LastName))
+                {
+                    errors.AppendLine("Etternavn må registreres slik at folk vet hvem du er.");
+                }
             }
 
             if (string.IsNullOrEmpty(user.WhatIDo)) {

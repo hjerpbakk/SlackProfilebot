@@ -1,0 +1,11 @@
+{
+  "apiToken": "[SlackAPIToken]",
+  "adminUserId": "[SlackAdminUserId]",
+  "applicationInsightsInstrumentationKey": "[ApplicationInsightsInstrumentationKey]",
+  "faceAPIAccessKey": "[FaceAPIAccessKey]",
+  "faceAPIURL": "[FaceAPIURL]",
+  "blobStorageAccountName": "[BlobStorageAccountName]",
+  "blobStorageAccessKey": "[BlobStorageAccessKey]",
+  "endpointSuffix": "core.windows.net",
+  "heartBeat": "false"
+}

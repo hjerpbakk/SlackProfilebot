@@ -64,7 +64,28 @@ As a regular user, anything you say will have the same effect: Profilebot will l
    }
    ```
 
-9. Build and run `Hjerpbakk.Profilebot.sln`.
+9. In Azure, create a new Face API resource
+    1. From the Azure Portal, select "Create a resource"
+    2. In the sidebar, select `AI + Machine Learning`, then `Face` to create a Face API resource
+    3. Give it a fitting name and finish the form. The resource may take a while to complete
+
+10. Add the Face API configuration to the ProfileBot solution
+    1.  On the sidebar of the Face API resource, select `Quick start`
+    2.  Copy the contents of `Key1` and `Endpoint` into `faceAPIAccessKey` and `faceAPIURL` respectively in `config.json`
+    3.  At the end of the Face API URL, add `/face/v1.0`
+
+11. In Azure, create a new Blob Storage, or use an existing one
+    1.  If you don't have an existing one, select `Create a resource` from the portal
+    2.  Select `Storage` from the sidebar, then `Storage Account`
+    3.  Give it a fitting name and set `Account kind` to `BlobStorage`
+    4.  Complete the form. The resource may take a while to complete
+
+12. Add the Blob Storage configuration to the ProfileBot solution
+    1.  In the sidebar of the Storage Account, select `Access keys`
+    2.  Copy the contents of `Storage account name` and `Key` into `blobStorageAccountName` and `blobStorageAccessKey` respectively in `config.json`
+    3.  The application will during its first run create a new container in the Blob Storage, titled `whitelist`
+
+13. Build and run `Hjerpbakk.Profilebot.sln`.
 
 You should now be able to send direct messages to Profilebot in your team's Slack. 
 
