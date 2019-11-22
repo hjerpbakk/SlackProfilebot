@@ -1,11 +1,13 @@
-﻿namespace Hjerpbakk.ProfileBot.Commands {
+﻿using System;
+
+namespace Hjerpbakk.Profilebot.Commands {
     internal class ProfileBotCommand {
         protected ProfileBotCommand() { }
     }
 
-    internal class ProfileBotCommand<T> : ProfileBotCommand where T : struct {
+    internal class ProfileBotCommand<T> : ProfileBotCommand where T : class {
         public ProfileBotCommand(T payload) {
-            Payload = payload;
+            Payload = payload ?? throw new ArgumentNullException();
         }
 
         public T Payload { get; }

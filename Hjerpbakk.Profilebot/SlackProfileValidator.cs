@@ -1,34 +1,39 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
+using Hjerpbakk.Profilebot.Contracts;
+using Hjerpbakk.Profilebot.FaceDetection;
 using SlackConnector.Models;
-using Hjerpbakk.ProfileBot.Contracts;
 
-namespace Hjerpbakk.ProfileBot {
+namespace Hjerpbakk.Profilebot {
     /// <summary>
-    /// Validates the profile of a Slack user according to your team's rules.
+    ///     Validates the profile of a Slack user according to your team's rules.
     /// </summary>
     public class SlackProfileValidator : ISlackProfileValidator {
         readonly string adminUserId;
+        readonly IFaceDetectionClient faceDetectionClient;
 
         /// <summary>
-        /// Creates the SlackProfileValidator.
+        ///     Creates the SlackProfileValidator.
         /// </summary>
         /// <param name="adminUser">The admin of this Slack team.</param>
-        public SlackProfileValidator(AdminUser adminUser) {
-            if (string.IsNullOrEmpty(adminUser.Id)) {
-                throw new ArgumentException(nameof(adminUser.Id));
-            }
-
+        /// <param name="faceDetectionClient"></param>
+        public SlackProfileValidator(SlackUser adminUser, IFaceDetectionClient faceDetectionClient) {
+            adminUser.Guard();
             adminUserId = adminUser.Id;
+            this.faceDetectionClient = faceDetectionClient ?? throw new ArgumentNullException(nameof(faceDetectionClient));
         }
 
         /// <summary>
-        /// Validates that a user profile is complete.
+        ///     Validates that a user profile is complete.
         /// </summary>
         /// <param name="user">The user to be validated.</param>
         /// <returns>The result of the validation.</returns>
-        public ProfileValidationResult ValidateProfile(SlackUser user) {
-            Verify(user);
+        public async Task<ProfileValidationResult> ValidateProfile(SlackUser user) {
+            user.Guard();
+            if (string.IsNullOrEmpty(user.Name)) {
+                throw new ArgumentException("Name cannot be empty.", nameof(user));
+            }
 
             var errors = new StringBuilder();
 
@@ -46,30 +51,16 @@ namespace Hjerpbakk.ProfileBot {
                 errors.AppendLine("Feltet \"What I do\" må inneholde team og hva du kan i DIPS.");
             }
 
-            ValidateProfileImage(user, errors);
+            var imageWasSuspect = await ValidateProfileImage(user, errors);
 
             var actualErrors = errors.ToString();
             return actualErrors.Length == 0 || user.IsBot || user.Deleted || user.Name == "slackbot"
-                ? new ProfileValidationResult(true, null, null)
-                : new ProfileValidationResult(false, user.Id,
+                ? ProfileValidationResult.Valid(user)
+                : new ProfileValidationResult(user,
                     $"Hei <@{user.Id}>, jeg har sett gjennom profilen din og den har følgende mangler:" +
-                    $"{Environment.NewLine}{actualErrors}{Environment.NewLine}" +
-                    "Se https://utvikling/t/slack/1822 for hva som kreves av en fullt utfylt profil." +
-                    $"{Environment.NewLine}Ta kontakt med <@{adminUserId}> dersom du har spørsmål.");
-        }
-
-        static void Verify(SlackUser user) {
-            if (user == null) {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (string.IsNullOrEmpty(user.Id)) {
-                throw new ArgumentException("Id cannot be empty.", nameof(user));
-            }
-
-            if (string.IsNullOrEmpty(user.Name)) {
-                throw new ArgumentException("Name cannot be empty.", nameof(user));
-            }
+                    $"{Environment.NewLine}{Environment.NewLine}{actualErrors}{Environment.NewLine}" +
+                    "Se https://github.com/DIPSAS/community/blob/master/communication/slack-guidelines.md for hva som kreves av en fullt utfylt profil." +
+                    $"{Environment.NewLine}Ta kontakt med #admins dersom du har spørsmål.", imageWasSuspect ? new Uri(user.Image) : null);
         }
 
         static void ValidateEmail(SlackUser user, StringBuilder errors) {
@@ -88,10 +79,19 @@ namespace Hjerpbakk.ProfileBot {
             }
         }
 
-        static void ValidateProfileImage(SlackUser user, StringBuilder errors) {
+        async Task<bool> ValidateProfileImage(SlackUser user, StringBuilder errors) {
             if (string.IsNullOrEmpty(user.Image)) {
                 errors.AppendLine("Legg inn et profilbilde slik at folk kjenner deg igjen.");
+                return false;
             }
+
+            var imageValidationResult = await faceDetectionClient.ValidateProfileImage(user);
+            if (imageValidationResult.IsValid) {
+                return false;
+            }
+
+            errors.AppendLine(imageValidationResult.Errors);
+            return true;
         }
     }
 }

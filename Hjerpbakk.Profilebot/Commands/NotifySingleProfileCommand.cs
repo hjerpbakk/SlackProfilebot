@@ -1,5 +1,7 @@
-﻿namespace Hjerpbakk.ProfileBot.Commands {
-    internal class NotifySingleProfileCommand : ProfileBotCommand<SlackStringUser> {
-        public NotifySingleProfileCommand(SlackStringUser slackStringUser) : base(slackStringUser) { }
+﻿using SlackConnector.Models;
+
+namespace Hjerpbakk.Profilebot.Commands {
+    internal class NotifySingleProfileCommand : ProfileBotCommand<SlackUser> {
+        public NotifySingleProfileCommand(SlackUser slackUser) : base(slackUser) { }
     }
 }

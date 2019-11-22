@@ -1,24 +1,109 @@
-version: 1.0.{build}
+# Master with deploy
+-
+  branches:
+    only:
+      - master
 
-image: Visual Studio 2017
+  version: 1.1.0.{build}
 
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
+  pull_requests:
+    do_not_increment_build_number: true
 
-before_build:
-  - nuget restore
+  image: Visual Studio 2017
 
-build:
-  project: Hjerpbakk.Profilebot.sln
-  verbosity: minimal
+  skip_commits:
+    files:
+      - README.md
 
-test_script:
- - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Debug\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*"
-after_test:
- - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
- - pip install codecov
- - codecov -f "coverage.xml"
+  environment:  
+    DOCKER_USER:
+      secure: i9T30C3Gi5+mGazI8PaXEA==
+    DOCKER_PASS:
+      secure: cIvXg8+kCw2JDjLaXUoKx/jAGsuIvnd6JeLDMcts7K8=
+    SLACK_TOKEN:
+      secure: +gRgRLkDDz+KHCNR+2HPcuTnobBNinqAxDbSfyd3kLuGc+qZXJmfCzes8YtFAa0L
+    ADMIN_USER_ID:
+      secure: pwPxIeKym+oeY9BQe/c+oA==
+    FACE_API_ACCESS_KEY:
+      secure: GSyy8Y/eMnQ9Hf7HMf9dNiDW6ZdE/uXSEFMJzvLHE8TS5GuZDTOyrALldmdXGi+o
+    FACE_API_URL:
+      secure: IR/gw0Y63PY29gIFW+l5seKvxmj4Upa6ZCS6MImeoYos3L9L1aOcYSwmVWilDof5x+BVi7NGUhvyEAR8P1AxoA==
+    INSIGHTS:
+      secure: 75oaXQhx7Z0tW7xqn8XuoRd0AV1hwAf7u5W9XCK5bje2DxaptjfPVJ7qdOSw+7mV
+    BLOB_STORAGE:
+      secure: 2RQPegoJG+fJAlSF8szG4HAYxaF8cNrZ4f95TdQTJt1qjPHEf4wMpINLGLgsOhQAkpUtjR+DjeyIHIP4ZDGkIAjN9cp1uDwm5nTSrFkVlC7P3IBWrDdrti40Q+7swpI/
+    CERT_PW:
+      secure: WM7RmuvGnxW2NEQ4ZlcUnMZd++nRyVSZgloJdfOVBmg=
+    VM_URL:
+      secure: 5uMnmDE5zt7qHskbuh8zm5kU9Ib3JFtFwzGpMcyk296EIJhMJSfs9flMRjW1GnfN
+    VM_USER:
+      secure: TZkmm9c6BTcnLdm8gLhT9w==
+    VM_PW:
+      secure: MF7kQFablniedlsJFTCTD1HprkUyPJVrEyK7u7SbHvQ=
+
+  install:  
+    - docker version
+    - nuget install secure-file -ExcludeVersion
+    - secure-file\tools\secure-file -decrypt profilebot.cer.enc -secret %CERT_PW%
+    - ps: .\InstallCert.ps1
+
+  configuration:
+  - Release
+
+  assembly_info:
+    patch: true
+    file: '**\AssemblyInfo.*'
+    assembly_version: '{version}'
+    assembly_file_version: '{version}'
+    assembly_informational_version: '{version}'
+
+  artifacts: 
+    - path: Hjerpbakk.Profilebot.Runner\bin\Release\
+      name: Profilebot
+      type: zip
+
+  before_build:
+    - nuget restore
+
+  build:
+    project: Hjerpbakk.Profilebot.sln
+    verbosity: minimal
+
+  test_script:
+    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"Test.Hjerpbakk.Profilebot\bin\Release\Test.Hjerpbakk.Profilebot.dll -noshadow" -output:"coverage.xml" -filter:"+[Hjerpbakk.*]* -[Test.Hjerpbakk*]*" -returntargetcode
+  after_test:
+    - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+    - pip install codecov
+    - codecov -f "coverage.xml"
+  
+  before_deploy:
+    - ps: (Get-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.default.json).replace('[apiToken]', $env:SLACK_TOKEN).replace('[adminUserId]', $env:ADMIN_USER_ID).replace('[faceAPIAccessKey]', $env:FACE_API_ACCESS_KEY).replace('[faceAPIURL]', $env:FACE_API_URL).replace('[applicationInsightsInstrumentationKey]', $env:INSIGHTS).replace('[blobStorageAccessKey]', $env:BLOB_STORAGE).replace('[blobStorageAccountName]', 'profilebotdb').replace('[endpointSuffix]', 'core.windows.net') | Set-Content Hjerpbakk.Profilebot.Runner\bin\Release\Configuration\config.json
+    - docker build -t hjerpbakk/profilebot .
+
+  deploy_script:
+    - ps: docker login -u="$env:DOCKER_USER" -p="$env:DOCKER_PASS"
+    - docker push hjerpbakk/profilebot
+    - ps: .\RunLatestContainer.ps1
+
+# Other branches, only build and test
+-
+  version: 1.1.0.{build}
+
+  pull_requests:
+    do_not_increment_build_number: true
+
+  image: Visual Studio 2017
+
+  skip_commits:
+    files:
+      - README.md
+
+  configuration:
+  - Debug
+
+  before_build:
+    - nuget restore
+
+  build:
+    project: Hjerpbakk.Profilebot.sln
+    verbosity: minimal

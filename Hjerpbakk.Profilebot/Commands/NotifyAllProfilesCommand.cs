@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hjerpbakk.ProfileBot.Commands {
+namespace Hjerpbakk.Profilebot.Commands {
     internal class NotifyAllProfilesCommand : ProfileBotCommand {
         static readonly Lazy<NotifyAllProfilesCommand> instance;
 
@@ -10,7 +10,8 @@ namespace Hjerpbakk.ProfileBot.Commands {
 
         NotifyAllProfilesCommand() { }
 
-        public static NotifyAllProfilesCommand Create() =>
-            instance.Value;
+        public static NotifyAllProfilesCommand Create() {
+            return instance.Value;
+        }
     }
 }

@@ -1,192 +1,245 @@
 ﻿using System;
-using Hjerpbakk.ProfileBot;
-using Hjerpbakk.ProfileBot.Contracts;
+using System.Threading.Tasks;
+using Hjerpbakk.Profilebot;
+using Hjerpbakk.Profilebot.Contracts;
+using Hjerpbakk.Profilebot.FaceDetection;
+using Moq;
 using SlackConnector.Models;
 using Xunit;
 
 namespace Test.Hjerpbakk.Profilebot {
     public class SlackProfileValidatorTests {
+        public SlackProfileValidatorTests() {
+            faceDetectionClient = new Mock<IFaceDetectionClient>();
+            slackProfileValidator = new SlackProfileValidator(new SlackUser {Id = "U1TBU8336"}, faceDetectionClient.Object);
+        }
+
         const string UserId = "SLACKUSERID";
 
         readonly ISlackProfileValidator slackProfileValidator;
+        readonly Mock<IFaceDetectionClient> faceDetectionClient;
 
-        public SlackProfileValidatorTests() {
-            slackProfileValidator = new SlackProfileValidator(new AdminUser("U1TBU8336"));
+        static SlackUser CreateUser() {
+            return new SlackUser {Id = UserId, Name = "roh"};
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyValidationResult(ProfileValidationResult validationResult) {
+            Assert.Equal(false, validationResult.IsValid);
+            Assert.Equal(UserId, validationResult.User.Id);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyEmailExist(ProfileValidationResult validationResult) {
+            Assert.Contains("Din DIPS-epost må være registrert på brukeren din.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyOtherThanDIPSMail(ProfileValidationResult validationResult) {
+            Assert.Contains("Kun DIPS-epost skal benyttes.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyWrongDIPSMail(ProfileValidationResult validationResult) {
+            Assert.Contains("Brukernavnet ditt skal kun være dine tre DIPS-bokstaver. Dette kan endres via https://dipsasa.slack.com/account/settings", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyMissingFirstName(ProfileValidationResult validationResult) {
+            Assert.Contains("Fornavn må registreres slik at folk vet hvem du er.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyMissingLastName(ProfileValidationResult validationResult) {
+            Assert.Contains("Etternavn må registreres slik at folk vet hvem du er.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyMissingWhatIDo(ProfileValidationResult validationResult) {
+            Assert.Contains("Feltet \"What I do\" må inneholde team og hva du kan i DIPS.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyMissingImage(ProfileValidationResult validationResult) {
+            Assert.Contains("Legg inn et profilbilde slik at folk kjenner deg igjen.", validationResult.Errors);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        static void VerifyBadImage(ProfileValidationResult validationResult) {
+            Assert.Contains("Bad image", validationResult.Errors);
         }
 
         [Fact]
-        public void VerifyProfile_SlackUserIsNull_Throws() {
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(null));
+        public void VerifyProfile_AdminIdIsNull_Throws() {
+            var exception = Record.Exception(() => new SlackProfileValidator(new SlackUser(), new Mock<IFaceDetectionClient>().Object));
+
+            Assert.IsType<ArgumentException>(exception);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_CompleteProfile_Valid() {
+            var user = CreateUser();
+            user.Email = "roh@dips.no";
+            user.FirstName = "Runar";
+            user.LastName = "Hjerpbakk";
+            user.WhatIDo = "Software Engineering Manager";
+            user.Image = "http://image.jpg";
+            faceDetectionClient.Setup(f => f.ValidateProfileImage(It.IsAny<SlackUser>())).ReturnsAsync(FaceDetectionResult.Valid);
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            Assert.Equal(true, validationResult.IsValid);
+            Assert.Same(user, validationResult.User);
+            Assert.Equal("", validationResult.Errors);
+            Assert.Null(validationResult.ImageURL);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_EverythingMissing_InvalidAndAllErrorsReturned() {
+            var user = CreateUser();
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyEmailExist(validationResult);
+            VerifyMissingFirstName(validationResult);
+            VerifyMissingLastName(validationResult);
+            VerifyMissingWhatIDo(validationResult);
+            VerifyMissingImage(validationResult);
+        }
+
+        [Fact]
+        public void VerifyProfile_FaceClientIsNull_Throws() {
+            var exception = Record.Exception(() => new SlackProfileValidator(new SlackUser {Id = "U1TBU8336"}, null));
 
             Assert.IsType<ArgumentNullException>(exception);
         }
 
         [Fact]
-        public void VerifyProfile_AdminIdIsNull_Throws() {
-            var exception = Record.Exception(() => new SlackProfileValidator(new AdminUser()));
+        public async Task VerifyProfile_HasMissingFirstName_Invalid() {
+            var user = CreateUser();
+            user.Email = "roh@dips.no";
 
-            Assert.IsType<ArgumentException>(exception);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyMissingFirstName(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoId_Throws() {
+        public async Task VerifyProfile_HasMissingImage_Invalid() {
+            var user = CreateUser();
+            user.Email = "roh@dips.no";
+            user.FirstName = "Runar";
+            user.LastName = "Hjerpbakk";
+            user.WhatIDo = "Software Engineering Manager";
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyMissingImage(validationResult);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_HasMissingLastName_Invalid() {
+            var user = CreateUser();
+            user.Email = "roh@dips.no";
+            user.FirstName = "Runar";
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyMissingLastName(validationResult);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_HasMissingWhatIDo_Invalid() {
+            var user = CreateUser();
+            user.Email = "roh@dips.no";
+            user.FirstName = "Runar";
+            user.LastName = "Hjerpbakk";
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyMissingWhatIDo(validationResult);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_HasNoId_Throws() {
             var user = new SlackUser();
 
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(user));
+            // ReSharper disable once PossibleNullReferenceException
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(user));
 
             Assert.IsType<ArgumentException>(exception);
-            Assert.Contains("Id cannot be empty.", exception.Message);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoName_Throws() {
+        public async Task VerifyProfile_HasNoMail_Invalid() {
+            var user = CreateUser();
+
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
+
+            VerifyValidationResult(validationResult);
+            VerifyEmailExist(validationResult);
+        }
+
+        [Fact]
+        public async Task VerifyProfile_HasNoName_Throws() {
             var user = new SlackUser {Id = UserId};
 
-            var exception = Record.Exception(() => slackProfileValidator.ValidateProfile(user));
+            // ReSharper disable once PossibleNullReferenceException
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(user));
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Contains("Name cannot be empty.", exception.Message);
         }
 
         [Fact]
-        public void VerifyProfile_HasNoMail_Invalid() {
-            var user = CreateUser();
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            VerifyValidationResult(validationResult);
-            VerifyEmailExist(validationResult);
-        }
-
-        [Fact]
-        public void VerifyProfile_HasOtherThanDIPSMail_Invalid() {
+        public async Task VerifyProfile_HasOtherThanDIPSMail_Invalid() {
             var user = CreateUser();
             user.Email = "runar@hjerpbakk.com";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyOtherThanDIPSMail(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasWrongDIPSMail_Invalid() {
+        public async Task VerifyProfile_HasWrongDIPSMail_Invalid() {
             var user = CreateUser();
             user.Email = "runar@dips.no";
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyWrongDIPSMail(validationResult);
         }
 
         [Fact]
-        public void VerifyProfile_HasMissingFirstName_Invalid() {
+        public async Task VerifyProfile_InvalidImage_InvalidAndAllErrorsReturned() {
             var user = CreateUser();
-            user.Email = "roh@dips.no";
+            user.Image = "http://image.jpg";
+            faceDetectionClient.Setup(f => f.ValidateProfileImage(It.IsAny<SlackUser>())).ReturnsAsync(new FaceDetectionResult("Bad image"));
 
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            VerifyValidationResult(validationResult);
-            VerifyMissingFirstName(validationResult);
-        }
-
-        [Fact]
-        public void VerifyProfile_HasMissingLastName_Invalid() {
-            var user = CreateUser();
-            user.Email = "roh@dips.no";
-            user.FirstName = "Runar";
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            VerifyValidationResult(validationResult);
-            VerifyMissingLastName(validationResult);
-        }
-
-        [Fact]
-        public void VerifyProfile_HasMissingWhatIDo_Invalid() {
-            var user = CreateUser();
-            user.Email = "roh@dips.no";
-            user.FirstName = "Runar";
-            user.LastName = "Hjerpbakk";
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            VerifyValidationResult(validationResult);
-            VerifyMissingWhatIDo(validationResult);
-        }
-
-        [Fact]
-        public void VerifyProfile_HasMissingImage_Invalid() {
-            var user = CreateUser();
-            user.Email = "roh@dips.no";
-            user.FirstName = "Runar";
-            user.LastName = "Hjerpbakk";
-            user.WhatIDo = "Software Engineering Manager";
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            VerifyValidationResult(validationResult);
-            VerifyMissingImage(validationResult);
-        }
-
-        [Fact]
-        public void VerifyProfile_CompleteProfile_Valid() {
-            var user = CreateUser();
-            user.Email = "roh@dips.no";
-            user.FirstName = "Runar";
-            user.LastName = "Hjerpbakk";
-            user.WhatIDo = "Software Engineering Manager";
-            user.Image = "http://image.com";
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
-
-            Assert.Equal(true, validationResult.IsValid);
-            Assert.Null(validationResult.UserId);
-            Assert.Null(validationResult.Errors);
-        }
-
-        [Fact]
-        public void VerifyProfile_EverythingMissing_InvalidAndAllErrorsReturned() {
-            var user = CreateUser();
-
-            var validationResult = slackProfileValidator.ValidateProfile(user);
+            var validationResult = await slackProfileValidator.ValidateProfile(user);
 
             VerifyValidationResult(validationResult);
             VerifyEmailExist(validationResult);
             VerifyMissingFirstName(validationResult);
             VerifyMissingLastName(validationResult);
             VerifyMissingWhatIDo(validationResult);
-            VerifyMissingImage(validationResult);
+            VerifyBadImage(validationResult);
         }
 
-        static SlackUser CreateUser() =>
-            new SlackUser {Id = UserId, Name = "roh"};
+        [Fact]
+        public async Task VerifyProfile_SlackUserIsNull_Throws() {
+            // ReSharper disable once PossibleNullReferenceException
+            var exception = await Record.ExceptionAsync(() => slackProfileValidator.ValidateProfile(null));
 
-        static void VerifyValidationResult(ProfileValidationResult validationResult) {
-            Assert.Equal(false, validationResult.IsValid);
-            Assert.Equal(UserId, validationResult.UserId);
+            Assert.IsType<ArgumentNullException>(exception);
         }
-
-        static void VerifyEmailExist(ProfileValidationResult validationResult) =>
-            Assert.Contains("Din DIPS-epost må være registrert på brukeren din.", validationResult.Errors);
-
-        static void VerifyOtherThanDIPSMail(ProfileValidationResult validationResult) =>
-            Assert.Contains("Kun DIPS-epost skal benyttes.", validationResult.Errors);
-
-        static void VerifyWrongDIPSMail(ProfileValidationResult validationResult) =>
-            Assert.Contains("Brukernavnet ditt skal kun være dine tre DIPS-bokstaver. Dette kan endres via https://dipsasa.slack.com/account/settings", validationResult.Errors);
-
-        static void VerifyMissingFirstName(ProfileValidationResult validationResult) =>
-            Assert.Contains("Fornavn må registreres slik at folk vet hvem du er.", validationResult.Errors);
-
-        static void VerifyMissingLastName(ProfileValidationResult validationResult) =>
-            Assert.Contains("Etternavn må registreres slik at folk vet hvem du er.", validationResult.Errors);
-
-        static void VerifyMissingWhatIDo(ProfileValidationResult validationResult) =>
-            Assert.Contains("Feltet \"What I do\" må inneholde team og hva du kan i DIPS.", validationResult.Errors);
-
-        static void VerifyMissingImage(ProfileValidationResult validationResult) =>
-            Assert.Contains("Legg inn et profilbilde slik at folk kjenner deg igjen.", validationResult.Errors);
     }
 }
