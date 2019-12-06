@@ -36,15 +36,16 @@ As a regular user, anything you say will have the same effect: Profilebot will l
 
 1. Clone the repository: `git clone https://github.com/Sankra/SlackProfilebot.git`
 
-2. Go to `Hjerpbakk.Profilebot.Runner/Configuration` and create a copy of `config.default.json`. 
+2. Create Configuration
+    1. Go to `Hjerpbakk.Profilebot.Runner/Configuration` and create a copy of `config.default.json`. 
+    2. Rename the copy to `config.json`.
+    3. ALTERNATIVELY, you can skip creating `config.json` and use user environment variables instead. If so, add all keys with their respective values as declared below to the environment variables instead of `config.json`.
 
-3. Rename the copy to `config.json`.
+3. Go to your Team's Slack [bot integration page](https://my.slack.com/services/new/bot).
 
-4. Go to your Team's Slack [bot integration page](https://my.slack.com/services/new/bot).
+4. Enter 'profilebot' as the Username and click the 'Add Bot Integration' button.
 
-5. Enter 'profilebot' as the Username and click the 'Add Bot Integration' button.
-
-6. Copy the generated API token and paste it as your  `apiToken` in `config.json`:
+5. Copy the generated API token and paste it as your  `apiToken` in `config.json`:
 
    ```
    {
@@ -53,9 +54,9 @@ As a regular user, anything you say will have the same effect: Profilebot will l
    }
    ```
 
-7. One user must be configured to be Profilebots admin user. This need not be an actual Slack admin, but the id must be a valid user id in the Slack team. Run https://api.slack.com/methods/users.list/test to find the user id you want to use.
+6. One user must be configured to be Profilebots admin user. This need not be an actual Slack admin, but the id must be a valid user id in the Slack team. Run https://api.slack.com/methods/users.list/test to find the user id you want to use.
 
-8. Copy the user id and paste it as your `adminUserId` in `config.json`:
+7. Copy the user id and paste it as your `adminUserId` in `config.json`:
 
    ```
    {
@@ -64,28 +65,28 @@ As a regular user, anything you say will have the same effect: Profilebot will l
    }
    ```
 
-9. In Azure, create a new Face API resource
+8. In Azure, create a new Face API resource
     1. From the Azure Portal, select "Create a resource"
     2. In the sidebar, select `AI + Machine Learning`, then `Face` to create a Face API resource
     3. Give it a fitting name and finish the form. The resource may take a while to complete
 
-10. Add the Face API configuration to the ProfileBot solution
+9.  Add the Face API configuration to the ProfileBot solution
     1.  On the sidebar of the Face API resource, select `Quick start`
     2.  Copy the contents of `Key1` and `Endpoint` into `faceAPIAccessKey` and `faceAPIURL` respectively in `config.json`
     3.  At the end of the Face API URL, add `/face/v1.0`
 
-11. In Azure, create a new Blob Storage, or use an existing one
+10. In Azure, create a new Blob Storage, or use an existing one
     1.  If you don't have an existing one, select `Create a resource` from the portal
     2.  Select `Storage` from the sidebar, then `Storage Account`
     3.  Give it a fitting name and set `Account kind` to `BlobStorage`
     4.  Complete the form. The resource may take a while to complete
 
-12. Add the Blob Storage configuration to the ProfileBot solution
+11. Add the Blob Storage configuration to the ProfileBot solution
     1.  In the sidebar of the Storage Account, select `Access keys`
     2.  Copy the contents of `Storage account name` and `Key` into `blobStorageAccountName` and `blobStorageAccessKey` respectively in `config.json`
     3.  The application will during its first run create a new container in the Blob Storage, titled `whitelist`
 
-13. Build and run `Hjerpbakk.Profilebot.sln`.
+12. Build and run `Hjerpbakk.Profilebot.sln`.
 
 You should now be able to send direct messages to Profilebot in your team's Slack. 
 

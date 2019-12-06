@@ -17,10 +17,14 @@ namespace Hjerpbakk.Profilebot.Runner {
 
         static void Main() {
             try {
-                var configurationReader = new ConfigReader();
+                //var configurationReader = new ConfigReader();
+                var configurationReader = new Configuration.Configuration();
+               
+                /*
                 if (!string.IsNullOrEmpty(configurationReader.ApplicationInsightsInstrumentationKey)) {
                     TelemetryConfiguration.Active.InstrumentationKey = configurationReader.ApplicationInsightsInstrumentationKey;
                 }
+                */
 
                 if (configurationReader.ShouldStartHeartBeat) {
                     keepAliveTimer = new Timer(HeartBeat, null, TimeSpan.Zero, TimeSpan.FromSeconds(100));
@@ -38,7 +42,7 @@ namespace Hjerpbakk.Profilebot.Runner {
 
                     host.UseNLog();
 
-                    host.OnException(exception => { logger.Fatal(exception, "Fatal error, Profilebot going down."); });
+                    host.OnException(exception => { Console.WriteLine(exception); logger.Fatal(exception, "Fatal error, Profilebot going down."); });
 
                     host.RunAsNetworkService();
 

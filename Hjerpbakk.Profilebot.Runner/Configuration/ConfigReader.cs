@@ -4,6 +4,7 @@ using System.Reflection;
 using Hjerpbakk.Profilebot.Configuration;
 using Newtonsoft.Json.Linq;
 using SlackConnector.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace Hjerpbakk.Profilebot.Runner.Configuration {
     public class ConfigReader {
@@ -35,7 +36,6 @@ namespace Hjerpbakk.Profilebot.Runner.Configuration {
             var json = File.ReadAllText(fileName);
             return JObject.Parse(json);
         }
-
         static string AssemblyLocation() {
             var assembly = Assembly.GetExecutingAssembly();
             var codebase = new Uri(assembly.CodeBase);

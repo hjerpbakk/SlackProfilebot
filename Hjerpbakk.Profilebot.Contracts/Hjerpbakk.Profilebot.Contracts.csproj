@@ -36,11 +36,11 @@
     <Reference Include="Flurl.Http, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Flurl.Http.2.4.2\lib\net46\Flurl.Http.dll</HintPath>
     </Reference>
-    <Reference Include="ISocketLite.PCL, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SocketLite.PCL.5.1.1\lib\net46\ISocketLite.PCL.dll</HintPath>
+    <Reference Include="ISocketLite.PCL, Version=5.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SocketLite.PCL.5.0.1\lib\net46\ISocketLite.PCL.dll</HintPath>
     </Reference>
-    <Reference Include="IWebsocketClientLite.PCL, Version=5.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebsocketClientLite.PCL.5.1.1\lib\netstandard2.0\IWebsocketClientLite.PCL.dll</HintPath>
+    <Reference Include="IWebsocketClientLite.PCL, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebsocketClientLite.PCL.5.0.0\lib\netstandard2.0\IWebsocketClientLite.PCL.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -49,7 +49,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SocketLite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SocketLite.PCL.5.1.1\lib\net46\SocketLite.dll</HintPath>
+      <HintPath>..\packages\SocketLite.PCL.5.0.1\lib\net46\SocketLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -80,7 +80,7 @@
       <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive, Version=4.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.4.1.6\lib\net46\System.Reactive.dll</HintPath>
+      <HintPath>..\packages\System.Reactive.4.1.0\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
@@ -129,7 +129,7 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WebsocketClientLite.PCL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebsocketClientLite.PCL.5.1.1\lib\netstandard2.0\WebsocketClientLite.PCL.dll</HintPath>
+      <HintPath>..\packages\WebsocketClientLite.PCL.5.0.0\lib\netstandard2.0\WebsocketClientLite.PCL.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="System.Security.Cryptography.Algorithms">
