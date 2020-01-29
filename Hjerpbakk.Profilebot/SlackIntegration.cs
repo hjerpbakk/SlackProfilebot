@@ -67,9 +67,15 @@ namespace Hjerpbakk.Profilebot {
                 throw new ArgumentException(nameof(userId));
             }
 
+            // Commented out to refresh user between checks
+            // If not, bot won't be able to recognize that a user has updated their info without a restart
+            /*
             return connection.UserCache.ContainsKey(userId)
                 ? connection.UserCache[userId]
                 : (await GetAllUsers()).SingleOrDefault(u => u.Id == userId);
+            */
+
+            return (await GetAllUsers()).SingleOrDefault(u => u.Id == userId);
         }
 
         /// <summary>

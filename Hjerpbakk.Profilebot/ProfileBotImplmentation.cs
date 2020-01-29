@@ -147,7 +147,8 @@ namespace Hjerpbakk.Profilebot {
 
         async Task AnswerRegularUser(SlackUser user) {
             await slackIntegration.SendDirectMessage(user, "Checking your profile");
-            var verificationResult = await slackProfileValidator.ValidateProfile(user);
+            var userToCheck = await slackIntegration.GetUser(user.Id);
+            var verificationResult = await slackProfileValidator.ValidateProfile(userToCheck);
             if (verificationResult.IsValid) {
                 await slackIntegration.SendDirectMessage(user,
                     $"Well done <@{user.Id}>, your profile is complete");
